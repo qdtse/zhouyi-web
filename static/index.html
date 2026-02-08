@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>周易卜卦 - Zhouyi Divination</title>
+    <style>
+        :root {
+            --bg-color: #fdfbf7;
+            --text-color: #2c2c2c;
+            --accent-color: #8b0000; /* Deep Red / Ink Red */
+            --secondary-color: #d4af37; /* Gold */
+            --card-bg: #ffffff;
+            --ink-black: #1a1a1a;
+            --font-serif: "Noto Serif SC", "Songti SC", serif;
+            --font-sans: "Noto Sans SC", sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-serif);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        header {
+            margin-top: 4rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--ink-black);
+            letter-spacing: 0.2rem;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            font-family: var(--font-sans);
+            color: #666;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+            letter-spacing: 0.1rem;
+            text-transform: uppercase;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            width: 90%;
+            padding: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid #e0e0e0;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent-color);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+            transform-origin: left;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--ink-black);
+        }
+
+        .card p {
+            font-family: var(--font-sans);
+            color: #555;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .input-group {
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            border-color: var(--accent-color);
+        }
+
+        button {
+            background-color: var(--ink-black);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            font-family: var(--font-serif);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s, transform 0.1s;
+            letter-spacing: 0.1rem;
+        }
+
+        button:hover {
+            background-color: var(--accent-color);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal {
+            background: #fff;
+            padding: 3rem;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            position: relative;
+            animation: slideUp 0.4s ease;
+            border: 1px solid #e0e0e0;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: var(--accent-color);
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 1rem;
+        }
+
+        .result-gua {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            font-size: 1.2rem;
+        }
+
+        .gua-item {
+            text-align: center;
+        }
+
+        .gua-symbol {
+            font-size: 4rem; /* Placeholder for Gua symbol/image */
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            color: var(--ink-black);
+            font-family: "Segoe UI Symbol", sans-serif; /* For Trigrams/Hexagrams unicode */
+        }
+
+        .gua-name {
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .result-content {
+            font-family: var(--font-serif);
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .result-content h3 {
+            font-size: 1.2rem;
+            color: var(--ink-black);
+            border-left: 3px solid var(--accent-color);
+            padding-left: 0.8rem;
+            margin-bottom: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--accent-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 2rem;
+            color: #888;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            .container { grid-template-columns: 1fr; }
+        }
+
+        /* Ziwei Chart */
+        .ziwei-chart {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            grid-template-areas:
+                "p5 p6 p7 p8"
+                "p4 center center p9"
+                "p3 center center p10"
+                "p2 p1 p0 p11";
+            gap: 1px;
+            background: #ccc;
+            border: 2px solid var(--ink-black);
+            width: 100%;
+            aspect-ratio: 1/1;
+            font-size: 0.8rem;
+            margin-top: 1rem;
+        }
+        .ziwei-cell {
+            background: #fff;
+            padding: 4px;
+            position: relative;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+        }
+        .ziwei-center {
+            grid-area: center;
+            background: #fdfbf7;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .major-star {
+            color: var(--accent-color);
+            font-weight: bold;
+            display: block;
+        }
+        .palace-name {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            font-weight: bold;
+            font-size: 0.9em;
+            background: rgba(255,255,255,0.8);
+        }
+        .palace-ganzhi {
+            position: absolute;
+            bottom: 2px;
+            left: 2px;
+            color: #666;
+            font-size: 0.8em;
+        }
+        .ming-shen-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: var(--accent-color);
+            color: white;
+            font-size: 0.7em;
+            padding: 1px 3px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>周易 · 卜卦</h1>
+        <div class="subtitle">The Book of Changes Divination</div>
+    </header>
+
+    <div class="container">
+        <!-- Text/Name Divination -->
+        <div class="card">
+            <h2>测字 / 起名</h2>
+            <p>输入汉字、姓名或公司名，测算吉凶含义。</p>
+            <div class="input-group">
+                <input type="text" id="input-text" placeholder="请输入文字 (如: 喜悦科技)">
+            </div>
+            <button onclick="divineText()">测 算</button>
+        </div>
+
+        <!-- Number Divination -->
+        <div class="card">
+            <h2>数字 / 号码</h2>
+            <p>手机号、车牌号、身份证号等数字吉凶。</p>
+            <div class="input-group">
+                <input type="text" id="input-number" placeholder="请输入号码 (如: 13800138000)">
+            </div>
+            <button onclick="divineNumber()">测 算</button>
+        </div>
+
+        <!-- Zhuge Divination -->
+        <div class="card">
+            <h2>诸葛神数</h2>
+            <p>输入三个汉字，测字解惑，灵验非常。</p>
+            <div class="input-group">
+                <input type="text" id="input-zhuge" placeholder="请输入三个字 (如: 报君知)">
+            </div>
+            <button onclick="divineZhuge()">诸葛测字</button>
+        </div>
+
+        <!-- Ziwei Doushu -->
+        <div class="card">
+            <h2>紫微斗数</h2>
+            <p>输入生辰八字，排布紫微命盘。</p>
+            <div class="input-group">
+                <input type="number" id="ziwei-year" placeholder="年 (如: 1990)" style="width:48%; display:inline-block;">
+                <input type="number" id="ziwei-month" placeholder="月" style="width:23%; display:inline-block;">
+                <input type="number" id="ziwei-day" placeholder="日" style="width:23%; display:inline-block;">
+                <input type="number" id="ziwei-hour" placeholder="时 (0-23)" style="margin-top:0.5rem;">
+            </div>
+            <button onclick="divineZiwei()">排 盘</button>
+        </div>
+
+        <!-- Random Divination -->
+        <div class="card">
+            <h2>诚心起卦</h2>
+            <p>静心默念心中所惑，随机起卦问吉凶。</p>
+            <button onclick="divineRandom()" style="margin-top: auto;">诚心起卦</button>
+        </div>
+
+        <!-- Time Divination -->
+        <div class="card">
+            <h2>时间起卦</h2>
+            <p>根据当前时辰起卦，洞察当下运势。</p>
+            <button onclick="divineCurrent()" style="margin-top: auto;">时间起卦</button>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="result-modal">
+        <div class="modal">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div id="modal-body">
+                <!-- Content injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 Zhouyi Web. Powered by Ichingshifa & Trae AI.
+    </footer>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/divine';
+
+        function showLoading() {
+            const modal = document.getElementById('result-modal');
+            const body = document.getElementById('modal-body');
+            body.innerHTML = '<div class="loading-spinner"></div><p style="text-align:center">正在推演...</p>';
+            modal.style.display = 'flex';
+        }
+
+        function showResult(data) {
+            const body = document.getElementById('modal-body');
+            
+            let html = '';
+            
+            if (data.type === 'zhuge') {
+                html = `
+                    <div class="result-header">
+                        <h2>诸葛神数 第 ${data.index} 签</h2>
+                    </div>
+                    <div class="result-content" style="text-align:center;">
+                        <p style="color:#666; font-size:0.9rem;">
+                            所测之字: <strong>${data.input}</strong><br>
+                            笔画: ${data.strokes.join(', ')} → 取数: ${data.numbers.join('')}
+                        </p>
+                        <h3 style="font-size:1.5rem; margin:1.5rem 0; color:var(--accent-color);">
+                            ${data.poem.replace(/，/g, '，<br>').replace(/。/g, '。<br>')}
+                        </h3>
+                        <div style="background:#f9f9f9; padding:1rem; border-radius:4px; text-align:left;">
+                            <strong>【解签】</strong><br>
+                            ${data.explain}
+                        </div>
+                    </div>
+                `;
+            } else if (data.palaces) {
+                // Ziwei Chart
+                const layout = [5, 6, 7, 8, 4, -1, -1, 9, 3, -1, -1, 10, 2, 1, 0, 11];
+                let cells = '';
+                layout.forEach(idx => {
+                    if (idx === -1) return;
+                    const p = data.palaces[idx];
+                    const stars = p.stars.map(s => `<span class="${s.type==='major'?'major-star':''}">${s.name}</span>`).join('');
+                    const badge = p.is_ming ? '<span class="ming-shen-badge">命宫</span>' : (p.is_shen ? '<span class="ming-shen-badge" style="background:#d4af37">身宫</span>' : '');
+                    cells += `<div class="ziwei-cell" style="grid-area: p${idx}">${badge}<div style="font-size:0.8em">${stars}</div><div class="palace-ganzhi">${p.gan}<br>${p.zhi}</div><div class="palace-name">${p.name}</div></div>`;
+                });
+                
+                const center = `<div class="ziwei-center"><h3 style="margin:0;color:var(--accent-color)">紫微斗数</h3><p style="margin:0.5rem 0;font-size:0.8em">${data.lunar}<br>${data.bazi}<br><strong style="color:var(--ink-black)">${data.wuxing_ju}</strong><br>命主: ${data.ming_palace} | 身主: ${data.shen_palace}</p></div>`;
+                
+                html = `<div class="result-header"><h2>紫微命盘</h2></div><div class="ziwei-chart">${cells}${center}</div>`;
+            } else {
+                // Default Hexagram Result
+                html = `
+                    <div class="result-header">
+                        <h2>${data.summary || '卦象结果'}</h2>
+                    </div>
+                    <div class="result-gua">
+                        <div class="gua-item">
+                            <div class="gua-name">本卦: ${data.ben_gua}</div>
+                        </div>
+                        ${data.zhi_gua ? `
+                        <div class="gua-item">
+                            <div class="gua-name">之卦: ${data.zhi_gua}</div>
+                        </div>` : ''}
+                    </div>
+                    <div class="result-content">
+                        ${data.main_text ? `
+                        <h3>核心断语</h3>
+                        <p>${data.main_text.replace(/\n/g, '<br>')}</p>
+                        ` : ''}
+                        
+                        ${data.ben_gua_text ? `
+                        <h3>卦辞</h3>
+                        <p>${data.ben_gua_text}</p>
+                        ` : ''}
+                    </div>
+                `;
+            }
+            
+            body.innerHTML = html;
+        }
+
+        function handleError(err) {
+            const body = document.getElementById('modal-body');
+            body.innerHTML = `<p style="color:red; text-align:center">起卦失败: ${err.message}</p>`;
+        }
+
+        function closeModal() {
+            document.getElementById('result-modal').style.display = 'none';
+        }
+
+        async function divineText() {
+            const text = document.getElementById('input-text').value.trim();
+            if (!text) return alert('请输入内容');
+            
+            showLoading();
+            try {
+                const res = await fetch(`${API_BASE}/text`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+                const data = await res.json();
+                showResult(data);
+            } catch (e) {
+                handleError(e);
+            }
+        }
+
+        async function divineNumber() {
+            const text = document.getElementById('input-number').value.trim();
+            if (!text) return alert('请输入号码');
+            
+            showLoading();
+            try {
+                // Reuse text endpoint as it handles numeric strings too
+                const res = await fetch(`${API_BASE}/text`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+                const data = await res.json();
+                showResult(data);
+            } catch (e) {
+                handleError(e);
+            }
+        }
+
+        async function divineZhuge() {
+            const text = document.getElementById('input-zhuge').value.trim();
+            if (!text) return alert('请输入文字');
+            
+            showLoading();
+            try {
+                const res = await fetch(`${API_BASE}/zhuge`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+                const data = await res.json();
+                
+                // Zhuge result structure: { type: 'zhuge', index, poem, explain, strokes, numbers }
+                showResult(data);
+            } catch (e) {
+                handleError(e);
+            }
+        }
+
+        async function divineZiwei() {
+            const year = parseInt(document.getElementById('ziwei-year').value);
+            const month = parseInt(document.getElementById('ziwei-month').value);
+            const day = parseInt(document.getElementById('ziwei-day').value);
+            const hour = parseInt(document.getElementById('ziwei-hour').value);
+
+            if (!year || !month || !day || isNaN(hour)) return alert('请输入完整的生辰信息');
+
+            showLoading();
+            try {
+                const res = await fetch(`${API_BASE}/ziwei`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ year, month, day, hour })
+                });
+                const data = await res.json();
+                showResult(data);
+            } catch (e) {
+                handleError(e);
+            }
+        }
+
+        async function divineRandom() {
+            showLoading();
+            try {
+                const res = await fetch(`${API_BASE}/random`);
+                const data = await res.json();
+                showResult(data);
+            } catch (e) {
+                handleError(e);
+            }
+        }
+
+        async function divineCurrent() {
+            showLoading();
+            try {
+                const res = await fetch(`${API_BASE}/current`);
+                const data = await res.json();
+                
+                // Adjust format if current endpoint returns different structure
+                // But utils.py tries to normalize it somewhat.
+                // datetime_bookgua result: { gua_name, ben_gua, moving_yao_info, main_text }
+                
+                if (data.type === 'datetime') {
+                     // Normalize to showResult format
+                     showResult({
+                         summary: data.gua_name,
+                         ben_gua: data.ben_gua,
+                         zhi_gua: data.moving_yao_info, // abuse field for yao info
+                         main_text: data.main_text,
+                         ben_gua_text: '' // Not provided in datetime tuple usually
+                     });
+                } else {
+                    showResult(data);
+                }
+            } catch (e) {
+                handleError(e);
+            }
+        }
+        
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('result-modal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
