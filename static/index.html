@@ -422,18 +422,76 @@
         </div>
     </div>
 
+    <!-- Footer -->
     <footer>
+        <div style="margin-bottom: 1rem;">
+            <button onclick="openDonationModal()" style="background:var(--accent-color); font-size:0.9rem; padding:0.5rem 1rem;">☕ 请大师喝茶 (随喜)</button>
+        </div>
         &copy; 2026 Zhouyi Web. Powered by Ichingshifa & Trae AI.
     </footer>
 
+    <!-- Donation Modal -->
+    <div class="modal-overlay" id="donation-modal">
+        <div class="modal" style="text-align:center;">
+            <span class="modal-close" onclick="closeDonationModal()">&times;</span>
+            <h2 style="color:var(--accent-color)">随喜功德</h2>
+            <p>如果您觉得本站对您有帮助，欢迎随喜打赏。</p>
+            <div style="display:flex; justify-content:center; gap:2rem; margin:2rem 0;">
+                <div>
+                    <div style="width:200px; height:200px; background:#eee; display:flex; align-items:center; justify-content:center; margin-bottom:0.5rem; overflow:hidden;">
+                        <img src="/wechat.png" alt="微信支付" style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                    <div>微信支付</div>
+                </div>
+                <div>
+                    <div style="width:200px; height:200px; background:#eee; display:flex; align-items:center; justify-content:center; margin-bottom:0.5rem; overflow:hidden;">
+                        <img src="/alipay.png" alt="支付宝" style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                    <div>支付宝</div>
+                </div>
+            </div>
+            <p style="font-size:0.8rem; color:#888;">您的支持是我们持续改进的动力。</p>
+        </div>
+    </div>
+
     <script>
         const API_BASE = 'http://localhost:8000/api/divine';
+
+        function openDonationModal() {
+            document.getElementById('donation-modal').style.display = 'flex';
+        }
+        
+        function closeDonationModal() {
+            document.getElementById('donation-modal').style.display = 'none';
+        }
 
         function showLoading() {
             const modal = document.getElementById('result-modal');
             const body = document.getElementById('modal-body');
             body.innerHTML = '<div class="loading-spinner"></div><p style="text-align:center">正在推演...</p>';
             modal.style.display = 'flex';
+        }
+
+        // Product Recommendations
+        const PRODUCTS = {
+            "gold": { name: "白水晶/金发晶手链", desc: "补金旺运，增强决断力", link: "#" },
+            "wood": { name: "绿幽灵/紫檀手串", desc: "补木生发，提升事业运", link: "#" },
+            "water": { name: "黑曜石/海蓝宝", desc: "补水聚财，增强智慧", link: "#" },
+            "fire": { name: "红玛瑙/朱砂饰品", desc: "补火旺运，避邪保平安", link: "#" },
+            "earth": { name: "黄水晶/泰山石", desc: "补土镇宅，招财纳福", link: "#" },
+            "general": { name: "五帝钱/平安符", desc: "镇宅化煞，出入平安", link: "#" }
+        };
+
+        function getRecommendation(type) {
+            // Simple mapping logic
+            // Ziwei wuxing_ju name maps to elements
+            if (!type) return PRODUCTS.general;
+            if (type.includes("金")) return PRODUCTS.gold;
+            if (type.includes("木")) return PRODUCTS.wood;
+            if (type.includes("水")) return PRODUCTS.water;
+            if (type.includes("火")) return PRODUCTS.fire;
+            if (type.includes("土")) return PRODUCTS.earth;
+            return PRODUCTS.general;
         }
 
         function showResult(data) {
@@ -475,6 +533,21 @@
                 const center = `<div class="ziwei-center"><h3 style="margin:0;color:var(--accent-color)">紫微斗数</h3><p style="margin:0.5rem 0;font-size:0.8em">${data.lunar}<br>${data.bazi}<br><strong style="color:var(--ink-black)">${data.wuxing_ju}</strong><br>命主: ${data.ming_palace} | 身主: ${data.shen_palace}</p></div>`;
                 
                 html = `<div class="result-header"><h2>紫微命盘</h2></div><div class="ziwei-chart">${cells}${center}</div>`;
+                
+                // Add recommendation
+                const rec = getRecommendation(data.wuxing_ju);
+                html += `
+                    <div style="margin-top:1.5rem; padding:1rem; border:1px dashed var(--accent-color); background:#fff5f5; border-radius:4px;">
+                        <h4 style="margin:0 0 0.5rem 0; color:var(--accent-color)">✨ 助运推荐</h4>
+                        <div style="display:flex; align-items:center; justify-content:space-between;">
+                            <div>
+                                <strong style="font-size:1.1rem">${rec.name}</strong>
+                                <p style="margin:0.2rem 0; font-size:0.8rem; color:#666">${rec.desc}</p>
+                            </div>
+                            <a href="${rec.link}" target="_blank" style="background:var(--secondary-color); color:white; padding:0.4rem 0.8rem; text-decoration:none; border-radius:4px; font-size:0.9rem;">查看详情</a>
+                        </div>
+                    </div>
+                `;
             } else {
                 // Default Hexagram Result
                 html = `
