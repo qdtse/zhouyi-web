@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from typing import Optional
 import utils
 import ziwei
+import bazi
 import os
 
 app = FastAPI(title="Zhouyi Divination API")
@@ -21,6 +22,7 @@ app.add_middleware(
 # Models
 class TextRequest(BaseModel):
     text: str
+    focus: Optional[str] = "general" # general, love, wealth, career
 
 class PairRequest(BaseModel):
     num1: int
@@ -35,6 +37,22 @@ class ZiweiRequest(BaseModel):
     day: int
     hour: int
 
+class BaziRequest(BaseModel):
+    year: int
+    month: int
+    day: int
+    hour: int
+
+class MatchRequest(BaseModel):
+    male_year: int
+    male_month: int
+    male_day: int
+    male_hour: int
+    female_year: int
+    female_month: int
+    female_day: int
+    female_hour: int
+
 # API Endpoints
 
 @app.get("/api/health")
@@ -45,9 +63,10 @@ async def health_check():
 async def divine_text(req: TextRequest):
     """
     Handles: Company Naming, Name Testing, Phone Number, License Plate, English Name
+    Supports focus: general, love, wealth, career
     """
     try:
-        result = utils.calculate_hexagram_from_text(req.text)
+        result = utils.calculate_hexagram_from_text(req.text, req.focus)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -104,6 +123,30 @@ async def divine_ziwei(req: ZiweiRequest):
     try:
         chart = ziwei.ZiweiChart(req.year, req.month, req.day, req.hour)
         return chart.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/divine/bazi")
+async def divine_bazi(req: BaziRequest):
+    """
+    Handles: Bazi Analysis (Eight Characters)
+    """
+    try:
+        result = bazi.get_bazi_analysis(req.year, req.month, req.day, req.hour)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/divine/match")
+async def divine_match(req: MatchRequest):
+    """
+    Handles: Bazi Marriage Compatibility
+    """
+    try:
+        male = bazi.get_bazi_analysis(req.male_year, req.male_month, req.male_day, req.male_hour)
+        female = bazi.get_bazi_analysis(req.female_year, req.female_month, req.female_day, req.female_hour)
+        result = bazi.check_marriage_compatibility(male, female)
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

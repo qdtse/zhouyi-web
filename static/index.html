@@ -78,6 +78,43 @@
             <div id="ziweiResult" class="result-area"></div>
         </div>
 
+        <!-- 7. Bazi Analysis -->
+        <div class="card">
+            <h2 data-i18n="bazi_title">八字算命 (四柱分析)</h2>
+            <p data-i18n="bazi_desc">输入出生时间，分析八字命盘、五行喜忌及日主强弱。</p>
+            <div class="input-group">
+                <input type="number" id="bazi_year" placeholder="年 (Year)" style="width: 25%">
+                <input type="number" id="bazi_month" placeholder="月 (Month)" style="width: 25%">
+                <input type="number" id="bazi_day" placeholder="日 (Day)" style="width: 25%">
+                <input type="number" id="bazi_hour" placeholder="时 (Hour)" style="width: 25%">
+            </div>
+            <button onclick="divineBazi()" data-i18n="divine_btn">立即测算</button>
+            <div id="baziResult" class="result-area"></div>
+        </div>
+
+        <!-- 8. Marriage Compatibility -->
+        <div class="card">
+            <h2 data-i18n="match_title">八字合婚 (姻缘匹配)</h2>
+            <p data-i18n="match_desc">输入双方出生时间，测算婚姻匹配度、生肖合冲及五行互补。</p>
+            <div class="subtitle-small" data-i18n="male_info">男方信息 (Male)</div>
+            <div class="input-group">
+                <input type="number" id="m_year" placeholder="年" style="width: 25%">
+                <input type="number" id="m_month" placeholder="月" style="width: 25%">
+                <input type="number" id="m_day" placeholder="日" style="width: 25%">
+                <input type="number" id="m_hour" placeholder="时" style="width: 25%">
+            </div>
+            <div class="subtitle-small" data-i18n="female_info">女方信息 (Female)</div>
+            <div class="input-group">
+                <input type="number" id="f_year" placeholder="年" style="width: 25%">
+                <input type="number" id="f_month" placeholder="月" style="width: 25%">
+                <input type="number" id="f_day" placeholder="日" style="width: 25%">
+                <input type="number" id="f_hour" placeholder="时" style="width: 25%">
+            </div>
+            <button onclick="divineMatch()" data-i18n="divine_btn">立即测算</button>
+            <div id="matchResult" class="result-area"></div>
+        </div>
+
+
         <!-- Donation -->
         <div class="card donation-card">
             <h2 data-i18n="donation_title">随喜打赏</h2>
@@ -125,6 +162,12 @@
                 time_desc: "以当前年月日时为基准，感应天时地利。",
                 ziwei_title: "紫微斗数 (排盘)",
                 ziwei_desc: "输入出生时间，排出紫微命盘 (仅供参考)。",
+                bazi_title: "八字算命 (四柱分析)",
+                bazi_desc: "输入出生时间，分析八字命盘、五行喜忌及日主强弱。",
+                match_title: "八字合婚 (姻缘匹配)",
+                match_desc: "输入双方出生时间，测算婚姻匹配度、生肖合冲及五行互补。",
+                male_info: "男方信息 (Male)",
+                female_info: "女方信息 (Female)",
                 result_label: "【测算结果】",
                 error_label: "错误: ",
                 input_error: "请输入内容",
@@ -155,6 +198,12 @@
                 time_desc: "Cast a hexagram based on the current date and time.",
                 ziwei_title: "Ziwei Dou Shu (Chart)",
                 ziwei_desc: "Input birth time to generate Ziwei Chart (Reference only).",
+                bazi_title: "Bazi Analysis (Four Pillars)",
+                bazi_desc: "Input birth time to analyze Bazi chart, Five Elements, and Day Master strength.",
+                match_title: "Bazi Marriage Compatibility",
+                match_desc: "Input birth times of both parties to check marriage compatibility.",
+                male_info: "Male Info",
+                female_info: "Female Info",
                 result_label: "[Result]",
                 error_label: "Error: ",
                 input_error: "Please input content",
@@ -337,6 +386,84 @@
                 showResult('ziweiResult', "紫微斗数排盘结果 (Ziwei Chart):\n\n" + data.chart);
             } catch (e) {
                 showResult('ziweiResult', translations[currentLang].error_label + e.message);
+            }
+        }
+
+        async function divineBazi() {
+            const y = document.getElementById('bazi_year').value;
+            const m = document.getElementById('bazi_month').value;
+            const d = document.getElementById('bazi_day').value;
+            const h = document.getElementById('bazi_hour').value;
+            
+            if (!y || !m || !d || !h) {
+                alert(translations[currentLang].input_error_date);
+                return;
+            }
+            
+            try {
+                 const res = await fetch(`${API_BASE}/bazi`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        year: parseInt(y),
+                        month: parseInt(m),
+                        day: parseInt(d),
+                        hour: parseInt(h)
+                    })
+                });
+                const data = await res.json();
+                
+                let display = "";
+                if (currentLang === 'en') {
+                    // Simple EN display (though backend returns mostly Chinese terms)
+                    display = `Solar: ${data.solar}\nLunar: ${data.lunar}\n\nBazi (Four Pillars):\n${data.bazi.join(' ')}\n\nDay Master: ${data.day_master.gan} (${data.day_master.wuxing}) - Strength: ${data.day_master.strength}\n\nFive Elements: ${JSON.stringify(data.wuxing_counts)}`;
+                } else {
+                    display = `阳历: ${data.solar}\n阴历: ${data.lunar}\n\n【八字排盘】\n${data.bazi.join('  ')}\n\n【日元分析】\n日主: ${data.day_master.gan} (${data.day_master.wuxing})\n强弱: ${data.day_master.strength} (${data.day_master.month_relation})\n\n【五行统计】\n${JSON.stringify(data.wuxing_counts).replace(/"/g, '').replace(/{/g, '').replace(/}/g, '').replace(/,/g, ', ')}\n缺: ${data.missing_wuxing.length > 0 ? data.missing_wuxing.join(',') : '无'}`;
+                }
+                
+                showResult('baziResult', display);
+            } catch (e) {
+                showResult('baziResult', translations[currentLang].error_label + e.message);
+            }
+        }
+
+        async function divineMatch() {
+            const m_y = document.getElementById('m_year').value;
+            const m_m = document.getElementById('m_month').value;
+            const m_d = document.getElementById('m_day').value;
+            const m_h = document.getElementById('m_hour').value;
+            
+            const f_y = document.getElementById('f_year').value;
+            const f_m = document.getElementById('f_month').value;
+            const f_d = document.getElementById('f_day').value;
+            const f_h = document.getElementById('f_hour').value;
+            
+            if (!m_y || !m_m || !m_d || !m_h || !f_y || !f_m || !f_d || !f_h) {
+                alert(translations[currentLang].input_error_date);
+                return;
+            }
+            
+            try {
+                 const res = await fetch(`${API_BASE}/match`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        male_year: parseInt(m_y), male_month: parseInt(m_m), male_day: parseInt(m_d), male_hour: parseInt(m_h),
+                        female_year: parseInt(f_y), female_month: parseInt(f_m), female_day: parseInt(f_d), female_hour: parseInt(f_h)
+                    })
+                });
+                const data = await res.json();
+                
+                let display = "";
+                if (currentLang === 'en') {
+                    display = `Score: ${data.score}\nLevel: ${data.level}\n\nAnalysis:\n${data.analysis.join('\n')}`;
+                } else {
+                    display = `【合婚评分】 ${data.score} 分\n【婚姻等级】 ${data.level}\n\n【详细分析】\n${data.analysis.join('\n')}\n\n男方八字: ${data.male_info.bazi}\n女方八字: ${data.female_info.bazi}`;
+                }
+                
+                showResult('matchResult', display);
+            } catch (e) {
+                showResult('matchResult', translations[currentLang].error_label + e.message);
             }
         }
     </script>

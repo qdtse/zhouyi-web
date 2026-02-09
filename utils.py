@@ -47,7 +47,15 @@ HEX_EN = {
     "泽火革": "Revolution", "火风鼎": "The Cauldron", "震为雷": "The Arousing", "艮为山": "Keeping Still",
     "风山渐": "Development", "雷泽归妹": "The Marrying Maiden", "雷火丰": "Abundance", "火山旅": "The Wanderer",
     "巽为风": "The Gentle", "兑为泽": "The Joyous", "风水涣": "Dispersion", "水泽节": "Limitation",
-    "风泽中孚": "Inner Truth", "雷山小过": "Preponderance of the Small", "水火既济": "After Completion", "火水未济": "Before Completion"
+    "风泽中孚": "Inner Truth", "雷山小过": "Preponderance of the Small", "水火既济": "After Completion", "火水未济": "Before Completion",
+    
+    # Traditional Chinese Mappings
+    "訟": "Conflict", "師": "The Army", "謙": "Modesty", "隨": "Following", "蠱": "Work on What Has Been Spoiled",
+    "臨": "Approach", "觀": "Contemplation", "賁": "Grace", "剝": "Splitting Apart", "復": "Return", "無妄": "Innocence",
+    "頤": "The Corners of the Mouth", "大過": "Preponderance of the Great", "離": "The Clinging", "恆": "Duration",
+    "大壯": "The Power of the Great", "晉": "Progress", "損": "Decrease", "漸": "Development", "歸妹": "The Marrying Maiden",
+    "豐": "Abundance", "兌": "The Joyous", "渙": "Dispersion", "節": "Limitation", "小過": "Preponderance of the Small",
+    "既濟": "After Completion", "未濟": "Before Completion"
 }
 
 NAME_TO_INDEX = {
@@ -58,7 +66,24 @@ NAME_TO_INDEX = {
     "遯": 33, "大壮": 34, "晋": 35, "明夷": 36, "家人": 37, "睽": 38, "蹇": 39, "解": 40,
     "损": 41, "益": 42, "夬": 43, "姤": 44, "萃": 45, "升": 46, "困": 47, "井": 48,
     "革": 49, "鼎": 50, "震": 51, "艮": 52, "渐": 53, "归妹": 54, "丰": 55, "旅": 56,
-    "巽": 57, "兑": 58, "涣": 59, "节": 60, "中孚": 61, "小过": 62, "既济": 63, "未济": 64
+    "巽": 57, "兑": 58, "涣": 59, "节": 60, "中孚": 61, "小过": 62, "既济": 63, "未济": 64,
+    
+    # Traditional Chinese Mappings for Index
+    "訟": 6, "師": 7, "謙": 15, "隨": 17, "蠱": 18, "臨": 19, "觀": 20, "賁": 22, "剝": 23, "復": 24,
+    "無妄": 25, "頤": 27, "大過": 28, "離": 30, "恆": 32, "大壯": 34, "晉": 35, "損": 41,
+    "漸": 53, "歸妹": 54, "豐": 55, "兌": 58, "渙": 59, "節": 60, "小過": 62, "既濟": 63, "未濟": 64
+}
+
+# 1:Qian(Metal), 2:Dui(Metal), 3:Li(Fire), 4:Zhen(Wood), 5:Xun(Wood), 6:Kan(Water), 7:Gen(Earth), 8:Kun(Earth)
+TRIGRAM_ELEMENTS = {
+    1: "metal", 2: "metal", 3: "fire", 4: "wood", 5: "wood", 6: "water", 7: "earth", 8: "earth"
+}
+ELEMENT_RELATIONS = {
+    "metal": {"sheng": "water", "ke": "wood"},
+    "wood": {"sheng": "fire", "ke": "earth"},
+    "water": {"sheng": "wood", "ke": "fire"},
+    "fire": {"sheng": "earth", "ke": "metal"},
+    "earth": {"sheng": "metal", "ke": "water"}
 }
 
 # Load English Yi Jing Data
@@ -91,7 +116,7 @@ def get_strokes(char):
         
     return 0 # Default fallback
 
-def calculate_hexagram_from_text(text):
+def calculate_hexagram_from_text(text, focus="general"):
     """
     Meihua Yishu Logic:
     1. Split text into Upper (First half) and Lower (Second half).
@@ -118,7 +143,7 @@ def calculate_hexagram_from_text(text):
     lower_sum = sum(get_strokes(c) for c in lower_text)
     total_sum = upper_sum + lower_sum
 
-    return calculate_hexagram_from_numbers(upper_sum, lower_sum, total_sum)
+    return calculate_hexagram_from_numbers(upper_sum, lower_sum, total_sum, focus)
 
 def calculate_zhuge_from_text(text):
     """
@@ -191,7 +216,91 @@ def get_hex_en(name):
             return HEX_EN[short]
     return name
 
-def calculate_hexagram_from_numbers(upper_val, lower_val, total_val=None):
+def calculate_meihua_interpretation(upper_val, lower_val, moving_yao, focus):
+    if focus == "general":
+        return {}
+        
+    upper_rem = upper_val % 8
+    if upper_rem == 0: upper_rem = 8
+
+    lower_rem = lower_val % 8
+    if lower_rem == 0: lower_rem = 8
+    
+    # Determine Ti (Body) and Yong (Application)
+    # Moving yao 1-3: Lower changes (Yong), Upper static (Ti)
+    # Moving yao 4-6: Upper changes (Yong), Lower static (Ti)
+    
+    if moving_yao <= 3:
+        ti_idx = upper_rem
+        yong_idx = lower_rem
+        position = "Lower Trigram Moves"
+    else:
+        ti_idx = lower_rem
+        yong_idx = upper_rem
+        position = "Upper Trigram Moves"
+        
+    ti_element = TRIGRAM_ELEMENTS[ti_idx]
+    yong_element = TRIGRAM_ELEMENTS[yong_idx]
+    
+    relation = "equal"
+    if ti_element == yong_element:
+        relation = "equal" # Bi He
+    elif ELEMENT_RELATIONS[yong_element]["sheng"] == ti_element:
+        relation = "yong_sheng_ti" # Great Auspicious
+    elif ELEMENT_RELATIONS[ti_element]["sheng"] == yong_element:
+        relation = "ti_sheng_yong" # Exhaustion
+    elif ELEMENT_RELATIONS[yong_element]["ke"] == ti_element:
+        relation = "yong_ke_ti" # Ominous
+    elif ELEMENT_RELATIONS[ti_element]["ke"] == yong_element:
+        relation = "ti_ke_yong" # Auspicious but hard
+        
+    advice = ""
+    # Interpretation based on Focus and Relation
+    if focus == "love": # 姻缘
+        if relation == "yong_sheng_ti":
+            advice = "Great Match. The other party loves you deeply. Success comes easily."
+        elif relation == "equal":
+            advice = "Harmonious relationship. Mutual understanding."
+        elif relation == "ti_sheng_yong":
+            advice = "You give more than you receive. Need patience."
+        elif relation == "ti_ke_yong":
+            advice = "You can control the situation, but need effort to win the heart."
+        elif relation == "yong_ke_ti":
+            advice = "Obstacles and pressure. The other party might be rejecting or situation is against you."
+            
+    elif focus == "wealth": # 财运
+        if relation == "yong_sheng_ti":
+            advice = "Great Fortune. Wealth comes to you naturally."
+        elif relation == "equal":
+            advice = "Good financial partnership. Stable income."
+        elif relation == "ti_sheng_yong":
+            advice = "Investment required. Money flows out before coming in."
+        elif relation == "ti_ke_yong":
+            advice = "Wealth through hard work. You can get it if you try."
+        elif relation == "yong_ke_ti":
+            advice = "Risk of loss. Bad for investment. Be conservative."
+            
+    elif focus == "career": # 官运/事业
+        if relation == "yong_sheng_ti":
+            advice = "Promotion and help from nobles. Career rises."
+        elif relation == "equal":
+            advice = "Cooperation and support from colleagues."
+        elif relation == "ti_sheng_yong":
+            advice = "Working hard for the team. Exhaustion but contributing."
+        elif relation == "ti_ke_yong":
+            advice = "Overcoming challenges. Success through capability."
+        elif relation == "yong_ke_ti":
+            advice = "Pressure from superiors or environment. Difficulties ahead."
+            
+    return {
+        "focus": focus,
+        "ti_element": ti_element,
+        "yong_element": yong_element,
+        "relation": relation,
+        "advice": advice
+    }
+
+def calculate_hexagram_from_numbers(upper_val, lower_val, total_val=None, focus="general"):
     if total_val is None:
         total_val = upper_val + lower_val
         
@@ -282,6 +391,11 @@ def calculate_hexagram_from_numbers(upper_val, lower_val, total_val=None):
         summary_en = summary_en.replace("吉", "Auspicious").replace("凶", "Ominous").replace("悔", "Regret").replace("吝", "Stingy/Small Trouble")
         
     response["summary_en"] = summary_en
+    
+    # Add Focus Advice
+    if focus != "general":
+        interpretation = calculate_meihua_interpretation(upper_val, lower_val, moving_yao, focus)
+        response.update(interpretation)
     
     # Populate English Text from YI_JING_EN
     ben_gua_name = result[1]
