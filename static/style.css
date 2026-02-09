@@ -1,0 +1,233 @@
+:root {
+    --bg-color: #fdfbf7;
+    --text-color: #2c2c2c;
+    --accent-color: #8b0000; /* Deep Red / Ink Red */
+    --secondary-color: #d4af37; /* Gold */
+    --card-bg: #ffffff;
+    --ink-black: #1a1a1a;
+    --font-serif: "Noto Serif SC", "Songti SC", serif;
+    --font-sans: "Noto Sans SC", sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-serif);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+header {
+    margin-top: 4rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    position: relative;
+}
+
+h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--ink-black);
+    letter-spacing: 0.2rem;
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+}
+
+.subtitle {
+    font-family: var(--font-sans);
+    color: #666;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+    letter-spacing: 0.1rem;
+    text-transform: uppercase;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    width: 90%;
+    padding: 2rem;
+}
+
+.card {
+    background: var(--card-bg);
+    border: 1px solid #e0e0e0;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+    transform-origin: left;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.card:hover::before {
+    transform: scaleX(1);
+}
+
+h2 {
+    margin-top: 0;
+    color: var(--accent-color);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+p {
+    line-height: 1.6;
+    color: #555;
+    flex-grow: 1;
+}
+
+input[type="text"], input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.input-group {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+button {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--font-serif);
+    transition: background-color 0.3s;
+    margin-top: 1rem;
+    width: 100%;
+}
+
+button:hover {
+    background-color: #600000;
+}
+
+.result-area {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    border-left: 4px solid var(--secondary-color);
+    text-align: left;
+    width: 100%;
+    box-sizing: border-box;
+    display: none;
+    white-space: pre-wrap; 
+}
+
+.result-title {
+    font-weight: bold;
+    color: var(--accent-color);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+footer {
+    margin-top: 4rem;
+    padding: 2rem;
+    color: #888;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.lang-switch {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 100;
+}
+
+.lang-btn {
+    background: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--text-color);
+    padding: 5px 10px;
+    width: auto;
+    margin: 0 5px;
+    font-family: var(--font-sans);
+    cursor: pointer;
+}
+
+.lang-btn.active {
+    background: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+.donation-card {
+    grid-column: 1 / -1;
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.qr-container {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.qr-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.qr-item img {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    border: 1px solid #eee;
+    padding: 5px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.qr-item span {
+    margin-top: 0.5rem;
+    font-weight: bold;
+    color: #555;
+    font-size: 0.9rem;
+}

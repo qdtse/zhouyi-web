@@ -14,6 +14,41 @@ if os.path.exists(zhuge_file):
     except:
         pass
 
+HEX_EN = {
+    "乾": "The Creative", "坤": "The Receptive", "屯": "Difficulty at the Beginning", "蒙": "Youthful Folly",
+    "需": "Waiting", "讼": "Conflict", "师": "The Army", "比": "Holding Together",
+    "小畜": "The Taming Power of the Small", "履": "Treading", "泰": "Peace", "否": "Standstill",
+    "同人": "Fellowship with Men", "大有": "Possession in Great Measure", "谦": "Modesty", "豫": "Enthusiasm",
+    "随": "Following", "蛊": "Work on What Has Been Spoiled", "临": "Approach", "观": "Contemplation",
+    "噬嗑": "Biting Through", "贲": "Grace", "剥": "Splitting Apart", "复": "Return",
+    "无妄": "Innocence", "大畜": "The Taming Power of the Great", "颐": "The Corners of the Mouth", "大过": "Preponderance of the Great",
+    "坎": "The Abysmal", "离": "The Clinging", "咸": "Influence", "恒": "Duration",
+    "遯": "Retreat", "大壮": "The Power of the Great", "晋": "Progress", "明夷": "Darkening of the Light",
+    "家人": "The Family", "睽": "Opposition", "蹇": "Obstruction", "解": "Deliverance",
+    "损": "Decrease", "益": "Increase", "夬": "Break-through", "姤": "Coming to Meet",
+    "萃": "Gathering Together", "升": "Pushing Upward", "困": "Oppression", "井": "The Well",
+    "革": "Revolution", "鼎": "The Cauldron", "震": "The Arousing", "艮": "Keeping Still",
+    "渐": "Development", "归妹": "The Marrying Maiden", "丰": "Abundance", "旅": "The Wanderer",
+    "巽": "The Gentle", "兑": "The Joyous", "涣": "Dispersion", "节": "Limitation",
+    "中孚": "Inner Truth", "小过": "Preponderance of the Small", "既济": "After Completion", "未济": "Before Completion",
+    "乾为天": "The Creative", "坤为地": "The Receptive", "水雷屯": "Difficulty at the Beginning", "山水蒙": "Youthful Folly",
+    "水天需": "Waiting", "天水讼": "Conflict", "地水师": "The Army", "水地比": "Holding Together",
+    "风天小畜": "The Taming Power of the Small", "天泽履": "Treading", "地天泰": "Peace", "天地否": "Standstill",
+    "天火同人": "Fellowship with Men", "火天大有": "Possession in Great Measure", "地山谦": "Modesty", "雷地豫": "Enthusiasm",
+    "泽雷随": "Following", "山风蛊": "Work on What Has Been Spoiled", "地泽临": "Approach", "风地观": "Contemplation",
+    "火雷噬嗑": "Biting Through", "山火贲": "Grace", "山地剥": "Splitting Apart", "地雷复": "Return",
+    "天雷无妄": "Innocence", "山天大畜": "The Taming Power of the Great", "山雷颐": "The Corners of the Mouth", "泽风大过": "Preponderance of the Great",
+    "坎为水": "The Abysmal", "离为火": "The Clinging", "泽山咸": "Influence", "雷风恒": "Duration",
+    "天山遯": "Retreat", "雷天大壮": "The Power of the Great", "火地晋": "Progress", "地火明夷": "Darkening of the Light",
+    "风火家人": "The Family", "火泽睽": "Opposition", "水山蹇": "Obstruction", "雷水解": "Deliverance",
+    "山泽损": "Decrease", "风雷益": "Increase", "泽天夬": "Break-through", "天风姤": "Coming to Meet",
+    "泽地萃": "Gathering Together", "地风升": "Pushing Upward", "泽水困": "Oppression", "水风井": "The Well",
+    "泽火革": "Revolution", "火风鼎": "The Cauldron", "震为雷": "The Arousing", "艮为山": "Keeping Still",
+    "风山渐": "Development", "雷泽归妹": "The Marrying Maiden", "雷火丰": "Abundance", "火山旅": "The Wanderer",
+    "巽为风": "The Gentle", "兑为泽": "The Joyous", "风水涣": "Dispersion", "水泽节": "Limitation",
+    "风泽中孚": "Inner Truth", "雷山小过": "Preponderance of the Small", "水火既济": "After Completion", "火水未济": "Before Completion"
+}
+
 def get_strokes(char):
     if char.isdigit():
         return int(char)
@@ -68,10 +103,7 @@ def calculate_zhuge_from_text(text):
     Zhuge Shenshu Logic:
     1. Take 3 chars (or first 3 chars, or map text to 3 numbers).
     2. If text length < 3, pad or repeat? 
-       Standard: 3 chars. 
-       If > 3, use first 3? Or sum?
-       Let's use the standard "Report 3 characters" method.
-       If user inputs more, take first 3. If less, pad with last char.
+    3. Use standard "Report 3 characters" method.
     """
     if not text:
         return {"error": "请输入至少一个字"}
@@ -89,21 +121,9 @@ def calculate_zhuge_from_text(text):
     s2 = get_strokes(c2)
     s3 = get_strokes(c3)
     
-    # Formula:
-    # 1. Hundreds digit from s1
-    # 2. Tens digit from s2
-    # 3. Ones digit from s3
-    # Logic from search result:
-    # "第一字作百数...凡字笔画...在十笔以外者。减十笔算...若恰在十笔或二十笔。俱照零笔计算。"
-    # Mod 10 logic.
-    
     n1 = s1 % 10
     n2 = s2 % 10
     n3 = s3 % 10
-    
-    # "所报之字笔画以三百八十四为度" -> Combine to number, then mod 384?
-    # Actually usually it is: (n1*100 + n2*10 + n3) % 384
-    # If 0, use 384.
     
     total_val = n1 * 100 + n2 * 10 + n3
     
@@ -119,7 +139,7 @@ def calculate_zhuge_from_text(text):
             break
             
     if not result:
-        # Fallback if local json is incomplete (I only added 100 items for demo)
+        # Fallback
         result = {
             "index": sign_idx, 
             "poem": "签文暂缺（数据扩充中）", 
@@ -133,8 +153,21 @@ def calculate_zhuge_from_text(text):
         "numbers": [n1, n2, n3],
         "index": sign_idx,
         "poem": result["poem"],
-        "explain": result["explain"]
+        "explain": result["explain"],
+        "poem_en": result.get("poem_en", ""),
+        "explain_en": result.get("explain_en", "")
     }
+
+def get_hex_en(name):
+    # Try full name
+    if name in HEX_EN:
+        return HEX_EN[name]
+    # Try short name (last char usually)
+    if len(name) > 1:
+        short = name[-1]
+        if short in HEX_EN:
+            return HEX_EN[short]
+    return name
 
 def calculate_hexagram_from_numbers(upper_val, lower_val, total_val=None):
     if total_val is None:
@@ -207,14 +240,22 @@ def calculate_hexagram_from_numbers(upper_val, lower_val, total_val=None):
     tuan_text = result[3].get(0, "")
     response["ben_gua_text"] = tuan_text
     
+    # English Translations
+    response["ben_gua_en"] = get_hex_en(result[1])
+    response["zhi_gua_en"] = get_hex_en(result[2])
+    
+    # Summary Translation
+    summary_en = response["summary"]
+    summary_en = summary_en.replace("吉", "Auspicious").replace("凶", "Ominous").replace("悔", "Regret").replace("吝", "Stingy/Small Trouble")
+    response["summary_en"] = summary_en
+    
+    response["main_text_en"] = "(Classical text translation unavailable)"
+    
     return response
 
 def get_random_divination():
     iching = ichingshifa.Iching()
     result = iching.bookgua_details()
-    
-    # Result structure for random might be slightly different or same
-    # Assuming same for simplicity based on previous manual tests
     
     response = {
         "ben_gua": result[1],
@@ -232,6 +273,14 @@ def get_random_divination():
             main_text = summary_tuple[2]
         response["main_text"] = main_text
         response["ben_gua_text"] = result[3].get(0, "")
+        
+        # Add EN
+        response["ben_gua_en"] = get_hex_en(response["ben_gua"])
+        response["zhi_gua_en"] = get_hex_en(response["zhi_gua"])
+        summary_en = response["summary"]
+        summary_en = summary_en.replace("吉", "Auspicious").replace("凶", "Ominous")
+        response["summary_en"] = summary_en
+        response["main_text_en"] = "(Classical text translation unavailable)"
     
     return response
 
@@ -251,6 +300,11 @@ def get_current_time_divination():
             "main_text": result[3],
             "type": "datetime"
         }
+        
+        # Add EN
+        response["gua_name_en"] = get_hex_en(result[0])
+        # Need to parse moving_yao_info for EN?
+        
         return response
     except Exception as e:
         return {"error": str(e)}

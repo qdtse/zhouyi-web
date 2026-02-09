@@ -4,713 +4,339 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>周易卜卦 - Zhouyi Divination</title>
-    <style>
-        :root {
-            --bg-color: #fdfbf7;
-            --text-color: #2c2c2c;
-            --accent-color: #8b0000; /* Deep Red / Ink Red */
-            --secondary-color: #d4af37; /* Gold */
-            --card-bg: #ffffff;
-            --ink-black: #1a1a1a;
-            --font-serif: "Noto Serif SC", "Songti SC", serif;
-            --font-sans: "Noto Sans SC", sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: var(--font-serif);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-
-        header {
-            margin-top: 4rem;
-            margin-bottom: 2rem;
-            text-align: center;
-            position: relative;
-        }
-
-        h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            margin: 0;
-            color: var(--ink-black);
-            letter-spacing: 0.2rem;
-            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
-        }
-
-        .subtitle {
-            font-family: var(--font-sans);
-            color: #666;
-            font-size: 1rem;
-            margin-top: 0.5rem;
-            letter-spacing: 0.1rem;
-            text-transform: uppercase;
-        }
-
-        .container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            max-width: 1200px;
-            width: 90%;
-            padding: 2rem;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border: 1px solid #e0e0e0;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--accent-color);
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-            transform-origin: left;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-
-        .card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .card h2 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: var(--ink-black);
-        }
-
-        .card p {
-            font-family: var(--font-sans);
-            color: #555;
-            font-size: 0.9rem;
-            margin-bottom: 1.5rem;
-            line-height: 1.5;
-        }
-
-        .input-group {
-            width: 100%;
-            margin-bottom: 1rem;
-        }
-
-        input[type="text"], input[type="number"] {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-family: var(--font-sans);
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.3s;
-            box-sizing: border-box;
-        }
-
-        input:focus {
-            border-color: var(--accent-color);
-        }
-
-        button {
-            background-color: var(--ink-black);
-            color: white;
-            border: none;
-            padding: 0.8rem 2rem;
-            font-size: 1rem;
-            font-family: var(--font-serif);
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background-color 0.3s, transform 0.1s;
-            letter-spacing: 0.1rem;
-        }
-
-        button:hover {
-            background-color: var(--accent-color);
-        }
-
-        button:active {
-            transform: scale(0.98);
-        }
-
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(5px);
-        }
-
-        .modal {
-            background: #fff;
-            padding: 3rem;
-            border-radius: 8px;
-            max-width: 600px;
-            width: 90%;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            position: relative;
-            animation: slideUp 0.4s ease;
-            border: 1px solid #e0e0e0;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 1rem;
-            right: 1.5rem;
-            font-size: 2rem;
-            cursor: pointer;
-            color: #999;
-            line-height: 1;
-        }
-
-        .modal-close:hover {
-            color: var(--accent-color);
-        }
-
-        .result-header {
-            text-align: center;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 1rem;
-        }
-
-        .result-gua {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 2rem;
-            font-size: 1.2rem;
-        }
-
-        .gua-item {
-            text-align: center;
-        }
-
-        .gua-symbol {
-            font-size: 4rem; /* Placeholder for Gua symbol/image */
-            line-height: 1;
-            margin-bottom: 0.5rem;
-            color: var(--ink-black);
-            font-family: "Segoe UI Symbol", sans-serif; /* For Trigrams/Hexagrams unicode */
-        }
-
-        .gua-name {
-            font-weight: bold;
-            color: var(--accent-color);
-        }
-
-        .result-content {
-            font-family: var(--font-serif);
-            line-height: 1.8;
-            color: #333;
-        }
-
-        .result-content h3 {
-            font-size: 1.2rem;
-            color: var(--ink-black);
-            border-left: 3px solid var(--accent-color);
-            padding-left: 0.8rem;
-            margin-bottom: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--accent-color);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 2rem auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        footer {
-            margin-top: auto;
-            padding: 2rem;
-            color: #888;
-            font-size: 0.8rem;
-            text-align: center;
-        }
-
-        /* Responsive */
-        @media (max-width: 600px) {
-            h1 { font-size: 2rem; }
-            .container { grid-template-columns: 1fr; }
-        }
-
-        /* Ziwei Chart */
-        .ziwei-chart {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(4, 1fr);
-            grid-template-areas:
-                "p5 p6 p7 p8"
-                "p4 center center p9"
-                "p3 center center p10"
-                "p2 p1 p0 p11";
-            gap: 1px;
-            background: #ccc;
-            border: 2px solid var(--ink-black);
-            width: 100%;
-            aspect-ratio: 1/1;
-            font-size: 0.8rem;
-            margin-top: 1rem;
-        }
-        .ziwei-cell {
-            background: #fff;
-            padding: 4px;
-            position: relative;
-            min-height: 80px;
-            display: flex;
-            flex-direction: column;
-        }
-        .ziwei-center {
-            grid-area: center;
-            background: #fdfbf7;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-        .major-star {
-            color: var(--accent-color);
-            font-weight: bold;
-            display: block;
-        }
-        .palace-name {
-            position: absolute;
-            bottom: 2px;
-            right: 2px;
-            font-weight: bold;
-            font-size: 0.9em;
-            background: rgba(255,255,255,0.8);
-        }
-        .palace-ganzhi {
-            position: absolute;
-            bottom: 2px;
-            left: 2px;
-            color: #666;
-            font-size: 0.8em;
-        }
-        .ming-shen-badge {
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            background: var(--accent-color);
-            color: white;
-            font-size: 0.7em;
-            padding: 1px 3px;
-            border-radius: 2px;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="lang-switch">
+        <button class="lang-btn active" onclick="setLang('zh')">中文</button>
+        <button class="lang-btn" onclick="setLang('en')">English</button>
+    </div>
 
     <header>
-        <h1>周易 · 卜卦</h1>
-        <div class="subtitle">The Book of Changes Divination</div>
+        <h1 data-i18n="title">周易卜卦</h1>
+        <div class="subtitle" data-i18n="subtitle">命理测算 / 诸葛神数 / 姓名分析</div>
     </header>
 
     <div class="container">
-        <!-- Text/Name Divination -->
+        <!-- 1. Text Divination -->
         <div class="card">
-            <h2>测字 / 起名</h2>
-            <p>输入汉字、姓名或公司名，测算吉凶含义。</p>
+            <h2 data-i18n="text_divination_title">公司/姓名/号码测吉凶</h2>
+            <p data-i18n="text_divination_desc">输入任何汉字、数字或英文，利用梅花易数原理进行起卦分析。</p>
+            <input type="text" id="textInput" placeholder="输入文字 (Input Text)" data-i18n-placeholder="text_placeholder">
+            <button onclick="divineText()" data-i18n="divine_btn">立即测算</button>
+            <div id="textResult" class="result-area"></div>
+        </div>
+
+        <!-- 2. Zhuge Shenshu -->
+        <div class="card">
+            <h2 data-i18n="zhuge_title">诸葛神数 (384签)</h2>
+            <p data-i18n="zhuge_desc">报字测前程，输入三个汉字，通过笔画数理求取诸葛神签。</p>
+            <input type="text" id="zhugeInput" placeholder="输入三个字 (Input 3 Chars)" data-i18n-placeholder="zhuge_placeholder">
+            <button onclick="divineZhuge()" data-i18n="divine_btn">立即测算</button>
+            <div id="zhugeResult" class="result-area"></div>
+        </div>
+
+        <!-- 3. Number Pair -->
+        <div class="card">
+            <h2 data-i18n="number_title">数字起卦 (梅花易数)</h2>
+            <p data-i18n="number_desc">输入两个数字（上卦与下卦），直接起卦预测。</p>
             <div class="input-group">
-                <input type="text" id="input-text" placeholder="请输入文字 (如: 喜悦科技)">
+                <input type="number" id="num1" placeholder="上卦 (Upper)" data-i18n-placeholder="upper_num_placeholder">
+                <input type="number" id="num2" placeholder="下卦 (Lower)" data-i18n-placeholder="lower_num_placeholder">
             </div>
-            <button onclick="divineText()">测 算</button>
+            <button onclick="divinePair()" data-i18n="divine_btn">立即测算</button>
+            <div id="pairResult" class="result-area"></div>
         </div>
 
-        <!-- Number Divination -->
+        <!-- 4. Random -->
         <div class="card">
-            <h2>数字 / 号码</h2>
-            <p>手机号、车牌号、身份证号等数字吉凶。</p>
+            <h2 data-i18n="random_title">随机起卦</h2>
+            <p data-i18n="random_desc">心诚则灵，随机抽取六爻卦象，解答心中疑惑。</p>
+            <button onclick="divineRandom()" data-i18n="divine_btn">立即测算</button>
+            <div id="randomResult" class="result-area"></div>
+        </div>
+
+        <!-- 5. Current Time -->
+        <div class="card">
+            <h2 data-i18n="time_title">当前时间起卦</h2>
+            <p data-i18n="time_desc">以当前年月日时为基准，感应天时地利。</p>
+            <button onclick="divineCurrent()" data-i18n="divine_btn">立即测算</button>
+            <div id="currentResult" class="result-area"></div>
+        </div>
+        
+         <!-- 6. Ziwei Dou Shu -->
+        <div class="card">
+            <h2 data-i18n="ziwei_title">紫微斗数 (排盘)</h2>
+            <p data-i18n="ziwei_desc">输入出生时间，排出紫微命盘 (仅供参考)。</p>
             <div class="input-group">
-                <input type="text" id="input-number" placeholder="请输入号码 (如: 13800138000)">
+                <input type="number" id="year" placeholder="年 (Year)" style="width: 25%">
+                <input type="number" id="month" placeholder="月 (Month)" style="width: 25%">
+                <input type="number" id="day" placeholder="日 (Day)" style="width: 25%">
+                <input type="number" id="hour" placeholder="时 (Hour)" style="width: 25%">
             </div>
-            <button onclick="divineNumber()">测 算</button>
+            <button onclick="divineZiwei()" data-i18n="divine_btn">立即测算</button>
+            <div id="ziweiResult" class="result-area"></div>
         </div>
 
-        <!-- Zhuge Divination -->
-        <div class="card">
-            <h2>诸葛神数</h2>
-            <p>输入三个汉字，测字解惑，灵验非常。</p>
-            <div class="input-group">
-                <input type="text" id="input-zhuge" placeholder="请输入三个字 (如: 报君知)">
+        <!-- Donation -->
+        <div class="card donation-card">
+            <h2 data-i18n="donation_title">随喜打赏</h2>
+            <p data-i18n="donation_desc">如果您觉得本站对您有帮助，欢迎随喜打赏支持。</p>
+            <div class="qr-container">
+                <div class="qr-item">
+                    <img src="wechat.png" alt="WeChat Pay">
+                    <span data-i18n="wechat_pay">微信支付</span>
+                </div>
+                <div class="qr-item">
+                    <img src="alipay.png" alt="Alipay">
+                    <span data-i18n="alipay">支付宝</span>
+                </div>
             </div>
-            <button onclick="divineZhuge()">诸葛测字</button>
         </div>
 
-        <!-- Ziwei Doushu -->
-        <div class="card">
-            <h2>紫微斗数</h2>
-            <p>输入生辰八字，排布紫微命盘。</p>
-            <div class="input-group">
-                <input type="number" id="ziwei-year" placeholder="年 (如: 1990)" style="width:48%; display:inline-block;">
-                <input type="number" id="ziwei-month" placeholder="月" style="width:23%; display:inline-block;">
-                <input type="number" id="ziwei-day" placeholder="日" style="width:23%; display:inline-block;">
-                <input type="number" id="ziwei-hour" placeholder="时 (0-23)" style="margin-top:0.5rem;">
-            </div>
-            <button onclick="divineZiwei()">排 盘</button>
-        </div>
-
-        <!-- Random Divination -->
-        <div class="card">
-            <h2>诚心起卦</h2>
-            <p>静心默念心中所惑，随机起卦问吉凶。</p>
-            <button onclick="divineRandom()" style="margin-top: auto;">诚心起卦</button>
-        </div>
-
-        <!-- Time Divination -->
-        <div class="card">
-            <h2>时间起卦</h2>
-            <p>根据当前时辰起卦，洞察当下运势。</p>
-            <button onclick="divineCurrent()" style="margin-top: auto;">时间起卦</button>
-        </div>
     </div>
 
-    <!-- Modal -->
-    <div class="modal-overlay" id="result-modal">
-        <div class="modal">
-            <span class="modal-close" onclick="closeModal()">&times;</span>
-            <div id="modal-body">
-                <!-- Content injected by JS -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
     <footer>
-        <div style="margin-bottom: 1rem;">
-            <button onclick="openDonationModal()" style="background:var(--accent-color); font-size:0.9rem; padding:0.5rem 1rem;">☕ 请大师喝茶 (随喜)</button>
-        </div>
-        &copy; 2026 Zhouyi Web. Powered by Ichingshifa & Trae AI.
+        &copy; 2024 Zhouyi Divination System. All rights reserved.
     </footer>
 
-    <!-- Donation Modal -->
-    <div class="modal-overlay" id="donation-modal">
-        <div class="modal" style="text-align:center;">
-            <span class="modal-close" onclick="closeDonationModal()">&times;</span>
-            <h2 style="color:var(--accent-color)">随喜功德</h2>
-            <p>如果您觉得本站对您有帮助，欢迎随喜打赏。</p>
-            <div style="display:flex; justify-content:center; gap:2rem; margin:2rem 0;">
-                <div>
-                    <div style="width:200px; height:200px; background:#eee; display:flex; align-items:center; justify-content:center; margin-bottom:0.5rem; overflow:hidden;">
-                        <img src="/wechat.png" alt="微信支付" style="width:100%; height:100%; object-fit:cover;">
-                    </div>
-                    <div>微信支付</div>
-                </div>
-                <div>
-                    <div style="width:200px; height:200px; background:#eee; display:flex; align-items:center; justify-content:center; margin-bottom:0.5rem; overflow:hidden;">
-                        <img src="/alipay.png" alt="支付宝" style="width:100%; height:100%; object-fit:cover;">
-                    </div>
-                    <div>支付宝</div>
-                </div>
-            </div>
-            <p style="font-size:0.8rem; color:#888;">您的支持是我们持续改进的动力。</p>
-        </div>
-    </div>
-
     <script>
-        const API_BASE = 'http://localhost:8000/api/divine';
+        const API_BASE = "/api/divine";
+        let currentLang = 'zh';
 
-        function openDonationModal() {
-            document.getElementById('donation-modal').style.display = 'flex';
-        }
-        
-        function closeDonationModal() {
-            document.getElementById('donation-modal').style.display = 'none';
-        }
-
-        function showLoading() {
-            const modal = document.getElementById('result-modal');
-            const body = document.getElementById('modal-body');
-            body.innerHTML = '<div class="loading-spinner"></div><p style="text-align:center">正在推演...</p>';
-            modal.style.display = 'flex';
-        }
-
-        // Product Recommendations
-        const PRODUCTS = {
-            "gold": { name: "白水晶/金发晶手链", desc: "补金旺运，增强决断力", link: "#" },
-            "wood": { name: "绿幽灵/紫檀手串", desc: "补木生发，提升事业运", link: "#" },
-            "water": { name: "黑曜石/海蓝宝", desc: "补水聚财，增强智慧", link: "#" },
-            "fire": { name: "红玛瑙/朱砂饰品", desc: "补火旺运，避邪保平安", link: "#" },
-            "earth": { name: "黄水晶/泰山石", desc: "补土镇宅，招财纳福", link: "#" },
-            "general": { name: "五帝钱/平安符", desc: "镇宅化煞，出入平安", link: "#" }
+        const translations = {
+            zh: {
+                title: "周易卜卦",
+                subtitle: "命理测算 / 诸葛神数 / 姓名分析",
+                text_divination_title: "公司/姓名/号码测吉凶",
+                text_divination_desc: "输入任何汉字、数字或英文，利用梅花易数原理进行起卦分析。",
+                text_placeholder: "输入文字",
+                divine_btn: "立即测算",
+                zhuge_title: "诸葛神数 (384签)",
+                zhuge_desc: "报字测前程，输入三个汉字，通过笔画数理求取诸葛神签。",
+                zhuge_placeholder: "输入三个字",
+                number_title: "数字起卦 (梅花易数)",
+                number_desc: "输入两个数字（上卦与下卦），直接起卦预测。",
+                upper_num_placeholder: "上卦数",
+                lower_num_placeholder: "下卦数",
+                random_title: "随机起卦",
+                random_desc: "心诚则灵，随机抽取六爻卦象，解答心中疑惑。",
+                time_title: "当前时间起卦",
+                time_desc: "以当前年月日时为基准，感应天时地利。",
+                ziwei_title: "紫微斗数 (排盘)",
+                ziwei_desc: "输入出生时间，排出紫微命盘 (仅供参考)。",
+                result_label: "【测算结果】",
+                error_label: "错误: ",
+                input_error: "请输入内容",
+                input_error_num: "请输入数字",
+                input_error_date: "请输入完整的日期时间",
+                donation_title: "随喜打赏",
+                donation_desc: "如果您觉得本站对您有帮助，欢迎随喜打赏支持。",
+                wechat_pay: "微信支付",
+                alipay: "支付宝"
+            },
+            en: {
+                title: "Zhouyi Divination",
+                subtitle: "Destiny / Zhuge Shenshu / Name Analysis",
+                text_divination_title: "Name/Number Analysis",
+                text_divination_desc: "Input any text, number, or English to analyze using Meihua Yishu principles.",
+                text_placeholder: "Input Text",
+                divine_btn: "Divination",
+                zhuge_title: "Zhuge Shenshu (384 Lots)",
+                zhuge_desc: "Input three characters to predict the future using Zhuge Shenshu numerology.",
+                zhuge_placeholder: "Input 3 Chars",
+                number_title: "Number Divination (Meihua)",
+                number_desc: "Input two numbers (Upper and Lower) to cast a hexagram.",
+                upper_num_placeholder: "Upper Num",
+                lower_num_placeholder: "Lower Num",
+                random_title: "Random Divination",
+                random_desc: "Sincerity is key. Randomly cast a hexagram to answer your doubts.",
+                time_title: "Current Time Divination",
+                time_desc: "Cast a hexagram based on the current date and time.",
+                ziwei_title: "Ziwei Dou Shu (Chart)",
+                ziwei_desc: "Input birth time to generate Ziwei Chart (Reference only).",
+                result_label: "[Result]",
+                error_label: "Error: ",
+                input_error: "Please input content",
+                input_error_num: "Please input numbers",
+                input_error_date: "Please input complete date and time",
+                donation_title: "Donation",
+                donation_desc: "If you find this site helpful, feel free to donate.",
+                wechat_pay: "WeChat Pay",
+                alipay: "Alipay"
+            }
         };
 
-        function getRecommendation(type) {
-            // Simple mapping logic
-            // Ziwei wuxing_ju name maps to elements
-            if (!type) return PRODUCTS.general;
-            if (type.includes("金")) return PRODUCTS.gold;
-            if (type.includes("木")) return PRODUCTS.wood;
-            if (type.includes("水")) return PRODUCTS.water;
-            if (type.includes("火")) return PRODUCTS.fire;
-            if (type.includes("土")) return PRODUCTS.earth;
-            return PRODUCTS.general;
+        function setLang(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.innerText === (lang === 'zh' ? '中文' : 'English')) {
+                    btn.classList.add('active');
+                }
+            });
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.innerText = translations[lang][key];
+                }
+            });
+
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (translations[lang][key]) {
+                    el.placeholder = translations[lang][key];
+                }
+            });
         }
 
-        function showResult(data) {
-            const body = document.getElementById('modal-body');
-            
-            let html = '';
-            
-            if (data.type === 'zhuge') {
-                html = `
-                    <div class="result-header">
-                        <h2>诸葛神数 第 ${data.index} 签</h2>
-                    </div>
-                    <div class="result-content" style="text-align:center;">
-                        <p style="color:#666; font-size:0.9rem;">
-                            所测之字: <strong>${data.input}</strong><br>
-                            笔画: ${data.strokes.join(', ')} → 取数: ${data.numbers.join('')}
-                        </p>
-                        <h3 style="font-size:1.5rem; margin:1.5rem 0; color:var(--accent-color);">
-                            ${data.poem.replace(/，/g, '，<br>').replace(/。/g, '。<br>')}
-                        </h3>
-                        <div style="background:#f9f9f9; padding:1rem; border-radius:4px; text-align:left;">
-                            <strong>【解签】</strong><br>
-                            ${data.explain}
-                        </div>
-                    </div>
-                `;
-            } else if (data.palaces) {
-                // Ziwei Chart
-                const layout = [5, 6, 7, 8, 4, -1, -1, 9, 3, -1, -1, 10, 2, 1, 0, 11];
-                let cells = '';
-                layout.forEach(idx => {
-                    if (idx === -1) return;
-                    const p = data.palaces[idx];
-                    const stars = p.stars.map(s => `<span class="${s.type==='major'?'major-star':''}">${s.name}</span>`).join('');
-                    const badge = p.is_ming ? '<span class="ming-shen-badge">命宫</span>' : (p.is_shen ? '<span class="ming-shen-badge" style="background:#d4af37">身宫</span>' : '');
-                    cells += `<div class="ziwei-cell" style="grid-area: p${idx}">${badge}<div style="font-size:0.8em">${stars}</div><div class="palace-ganzhi">${p.gan}<br>${p.zhi}</div><div class="palace-name">${p.name}</div></div>`;
-                });
-                
-                const center = `<div class="ziwei-center"><h3 style="margin:0;color:var(--accent-color)">紫微斗数</h3><p style="margin:0.5rem 0;font-size:0.8em">${data.lunar}<br>${data.bazi}<br><strong style="color:var(--ink-black)">${data.wuxing_ju}</strong><br>命主: ${data.ming_palace} | 身主: ${data.shen_palace}</p></div>`;
-                
-                html = `<div class="result-header"><h2>紫微命盘</h2></div><div class="ziwei-chart">${cells}${center}</div>`;
-                
-                // Add recommendation
-                const rec = getRecommendation(data.wuxing_ju);
-                html += `
-                    <div style="margin-top:1.5rem; padding:1rem; border:1px dashed var(--accent-color); background:#fff5f5; border-radius:4px;">
-                        <h4 style="margin:0 0 0.5rem 0; color:var(--accent-color)">✨ 助运推荐</h4>
-                        <div style="display:flex; align-items:center; justify-content:space-between;">
-                            <div>
-                                <strong style="font-size:1.1rem">${rec.name}</strong>
-                                <p style="margin:0.2rem 0; font-size:0.8rem; color:#666">${rec.desc}</p>
-                            </div>
-                            <a href="${rec.link}" target="_blank" style="background:var(--secondary-color); color:white; padding:0.4rem 0.8rem; text-decoration:none; border-radius:4px; font-size:0.9rem;">查看详情</a>
-                        </div>
-                    </div>
-                `;
-            } else {
-                // Default Hexagram Result
-                html = `
-                    <div class="result-header">
-                        <h2>${data.summary || '卦象结果'}</h2>
-                    </div>
-                    <div class="result-gua">
-                        <div class="gua-item">
-                            <div class="gua-name">本卦: ${data.ben_gua}</div>
-                        </div>
-                        ${data.zhi_gua ? `
-                        <div class="gua-item">
-                            <div class="gua-name">之卦: ${data.zhi_gua}</div>
-                        </div>` : ''}
-                    </div>
-                    <div class="result-content">
-                        ${data.main_text ? `
-                        <h3>核心断语</h3>
-                        <p>${data.main_text.replace(/\n/g, '<br>')}</p>
-                        ` : ''}
-                        
-                        ${data.ben_gua_text ? `
-                        <h3>卦辞</h3>
-                        <p>${data.ben_gua_text}</p>
-                        ` : ''}
-                    </div>
-                `;
-            }
-            
-            body.innerHTML = html;
-        }
-
-        function handleError(err) {
-            const body = document.getElementById('modal-body');
-            body.innerHTML = `<p style="color:red; text-align:center">起卦失败: ${err.message}</p>`;
-        }
-
-        function closeModal() {
-            document.getElementById('result-modal').style.display = 'none';
+        async function showResult(elementId, text) {
+            const el = document.getElementById(elementId);
+            el.style.display = 'block';
+            el.innerHTML = `<span class="result-title">${translations[currentLang].result_label}</span><br>${text}`;
         }
 
         async function divineText() {
-            const text = document.getElementById('input-text').value.trim();
-            if (!text) return alert('请输入内容');
-            
-            showLoading();
-            try {
-                const res = await fetch(`${API_BASE}/text`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text })
-                });
-                const data = await res.json();
-                showResult(data);
-            } catch (e) {
-                handleError(e);
+            const text = document.getElementById('textInput').value;
+            if (!text) {
+                alert(translations[currentLang].input_error);
+                return;
             }
-        }
-
-        async function divineNumber() {
-            const text = document.getElementById('input-number').value.trim();
-            if (!text) return alert('请输入号码');
-            
-            showLoading();
             try {
-                // Reuse text endpoint as it handles numeric strings too
                 const res = await fetch(`${API_BASE}/text`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({text})
                 });
                 const data = await res.json();
-                showResult(data);
+                
+                let display = "";
+                if (currentLang === 'en' && data.ben_gua_en) {
+                     display = `Hexagram: ${data.ben_gua_en} -> ${data.zhi_gua_en}\nSummary: ${data.summary_en}\n\n${data.main_text_en || data.main_text}`;
+                } else {
+                     display = `卦象: ${data.ben_gua} 之 ${data.zhi_gua}\n断语: ${data.summary}\n\n${data.main_text}\n\n${data.ben_gua_text}`;
+                }
+                
+                showResult('textResult', display);
             } catch (e) {
-                handleError(e);
+                showResult('textResult', translations[currentLang].error_label + e.message);
             }
         }
 
         async function divineZhuge() {
-            const text = document.getElementById('input-zhuge').value.trim();
-            if (!text) return alert('请输入文字');
-            
-            showLoading();
+            const text = document.getElementById('zhugeInput').value;
+            if (!text) {
+                alert(translations[currentLang].input_error);
+                return;
+            }
             try {
                 const res = await fetch(`${API_BASE}/zhuge`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({text})
                 });
                 const data = await res.json();
                 
-                // Zhuge result structure: { type: 'zhuge', index, poem, explain, strokes, numbers }
-                showResult(data);
+                let display = "";
+                if (currentLang === 'en') {
+                    display = `Lot No: ${data.index}\nPoem: ${data.poem_en || data.poem}\nExplanation: ${data.explain_en || data.explain}`;
+                } else {
+                    display = `签号: ${data.index}\n签诗: ${data.poem}\n解签: ${data.explain}`;
+                }
+                
+                showResult('zhugeResult', display);
             } catch (e) {
-                handleError(e);
+                showResult('zhugeResult', translations[currentLang].error_label + e.message);
             }
         }
 
-        async function divineZiwei() {
-            const year = parseInt(document.getElementById('ziwei-year').value);
-            const month = parseInt(document.getElementById('ziwei-month').value);
-            const day = parseInt(document.getElementById('ziwei-day').value);
-            const hour = parseInt(document.getElementById('ziwei-hour').value);
-
-            if (!year || !month || !day || isNaN(hour)) return alert('请输入完整的生辰信息');
-
-            showLoading();
+        async function divinePair() {
+            const num1 = document.getElementById('num1').value;
+            const num2 = document.getElementById('num2').value;
+            if (!num1 || !num2) {
+                alert(translations[currentLang].input_error_num);
+                return;
+            }
             try {
-                const res = await fetch(`${API_BASE}/ziwei`, {
+                const res = await fetch(`${API_BASE}/pair`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ year, month, day, hour })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({num1: parseInt(num1), num2: parseInt(num2)})
                 });
                 const data = await res.json();
-                showResult(data);
+                
+                let display = "";
+                 if (currentLang === 'en' && data.ben_gua_en) {
+                     display = `Hexagram: ${data.ben_gua_en} -> ${data.zhi_gua_en}\nSummary: ${data.summary_en}\n\n${data.main_text_en || data.main_text}`;
+                } else {
+                     display = `卦象: ${data.ben_gua} 之 ${data.zhi_gua}\n断语: ${data.summary}\n\n${data.main_text}\n\n${data.ben_gua_text}`;
+                }
+                
+                showResult('pairResult', display);
             } catch (e) {
-                handleError(e);
+                showResult('pairResult', translations[currentLang].error_label + e.message);
             }
         }
 
         async function divineRandom() {
-            showLoading();
             try {
                 const res = await fetch(`${API_BASE}/random`);
                 const data = await res.json();
-                showResult(data);
+                 let display = "";
+                 if (currentLang === 'en' && data.ben_gua_en) {
+                     display = `Hexagram: ${data.ben_gua_en} -> ${data.zhi_gua_en}\nSummary: ${data.summary_en}\n\n${data.main_text_en || data.main_text}`;
+                } else {
+                     display = `卦象: ${data.ben_gua} 之 ${data.zhi_gua}\n断语: ${data.summary}\n\n${data.main_text}\n\n${data.ben_gua_text}`;
+                }
+                showResult('randomResult', display);
             } catch (e) {
-                handleError(e);
+                showResult('randomResult', translations[currentLang].error_label + e.message);
             }
         }
 
         async function divineCurrent() {
-            showLoading();
             try {
                 const res = await fetch(`${API_BASE}/current`);
                 const data = await res.json();
-                
-                // Adjust format if current endpoint returns different structure
-                // But utils.py tries to normalize it somewhat.
-                // datetime_bookgua result: { gua_name, ben_gua, moving_yao_info, main_text }
-                
-                if (data.type === 'datetime') {
-                     // Normalize to showResult format
-                     showResult({
-                         summary: data.gua_name,
-                         ben_gua: data.ben_gua,
-                         zhi_gua: data.moving_yao_info, // abuse field for yao info
-                         main_text: data.main_text,
-                         ben_gua_text: '' // Not provided in datetime tuple usually
-                     });
+                let display = "";
+                if (currentLang === 'en') {
+                     display = `Time Hexagram: ${data.gua_name}\nMoving Yao: ${data.moving_yao_info}\nText: ${data.main_text}`;
                 } else {
-                    showResult(data);
+                     display = `时间卦: ${data.gua_name}\n变爻: ${data.moving_yao_info}\n爻辞: ${data.main_text}`;
                 }
+                showResult('currentResult', display);
             } catch (e) {
-                handleError(e);
+                showResult('currentResult', translations[currentLang].error_label + e.message);
             }
         }
         
-        // Close modal on outside click
-        window.onclick = function(event) {
-            const modal = document.getElementById('result-modal');
-            if (event.target == modal) {
-                closeModal();
+        async function divineZiwei() {
+            const y = document.getElementById('year').value;
+            const m = document.getElementById('month').value;
+            const d = document.getElementById('day').value;
+            const h = document.getElementById('hour').value;
+            
+            if (!y || !m || !d || !h) {
+                alert(translations[currentLang].input_error_date);
+                return;
+            }
+            
+            try {
+                 const res = await fetch(`${API_BASE}/ziwei`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        year: parseInt(y),
+                        month: parseInt(m),
+                        day: parseInt(d),
+                        hour: parseInt(h)
+                    })
+                });
+                const data = await res.json();
+                showResult('ziweiResult', "紫微斗数排盘结果 (Ziwei Chart):\n\n" + data.chart);
+            } catch (e) {
+                showResult('ziweiResult', translations[currentLang].error_label + e.message);
             }
         }
     </script>
