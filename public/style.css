@@ -171,6 +171,75 @@ button:hover {
     display: block;
 }
 
+/* Help Button & Dialog */
+.card-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.card-header h2 {
+    margin: 0;
+}
+
+.help-btn {
+    background: none;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    padding: 0;
+    margin: 0;
+    font-size: 14px;
+    line-height: 22px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: all 0.3s;
+    display: block; /* Always visible */
+}
+
+.help-btn:hover {
+    background: var(--accent-color);
+    color: white;
+    opacity: 1;
+}
+
+.tooltip {
+    position: fixed;
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    padding: 1rem;
+    border-radius: 8px;
+    width: 300px;
+    z-index: 1000;
+    pointer-events: none; /* Let mouse events pass through */
+    opacity: 0;
+    transition: opacity 0.2s;
+    font-family: var(--font-sans);
+}
+
+.tooltip.active {
+    opacity: 1;
+}
+
+.tooltip h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--accent-color);
+    font-size: 1rem;
+}
+
+.tooltip p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.5;
+}
+
 footer {
     margin-top: 4rem;
     padding: 2rem;
@@ -232,6 +301,23 @@ footer {
     background: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.paypal-link {
+    display: block;
+    width: 200px;
+    height: 200px;
+}
+
+.paypal-link img {
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.paypal-link:hover img {
+    transform: scale(1.05);
 }
 
 .qr-item span {

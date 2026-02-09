@@ -18,9 +18,18 @@
     </header>
 
     <div class="container">
+        <!-- Help Tooltip (Replaces Dialog) -->
+        <div id="helpTooltip" class="tooltip">
+            <h4 id="tooltipTitle"></h4>
+            <p id="tooltipText"></p>
+        </div>
+
         <!-- 1. Text Divination -->
         <div class="card">
-            <h2 data-i18n="text_divination_title">公司/姓名/号码测吉凶</h2>
+            <div class="card-header">
+                <h2 data-i18n="text_divination_title">公司/姓名/号码测吉凶</h2>
+                <div class="help-btn" data-module="text">?</div>
+            </div>
             <p data-i18n="text_divination_desc">输入任何汉字、数字或英文，利用梅花易数原理进行起卦分析。</p>
             <input type="text" id="textInput" placeholder="输入文字 (Input Text)" data-i18n-placeholder="text_placeholder">
             <button onclick="divineText()" data-i18n="divine_btn">立即测算</button>
@@ -29,7 +38,10 @@
 
         <!-- 2. Zhuge Shenshu -->
         <div class="card">
-            <h2 data-i18n="zhuge_title">诸葛神数 (384签)</h2>
+            <div class="card-header">
+                <h2 data-i18n="zhuge_title">诸葛神数 (384签)</h2>
+                <div class="help-btn" data-module="zhuge">?</div>
+            </div>
             <p data-i18n="zhuge_desc">报字测前程，输入三个汉字，通过笔画数理求取诸葛神签。</p>
             <input type="text" id="zhugeInput" placeholder="输入三个字 (Input 3 Chars)" data-i18n-placeholder="zhuge_placeholder">
             <button onclick="divineZhuge()" data-i18n="divine_btn">立即测算</button>
@@ -38,7 +50,10 @@
 
         <!-- 3. Number Pair -->
         <div class="card">
-            <h2 data-i18n="number_title">数字起卦 (梅花易数)</h2>
+            <div class="card-header">
+                <h2 data-i18n="number_title">数字起卦 (梅花易数)</h2>
+                <div class="help-btn" data-module="number">?</div>
+            </div>
             <p data-i18n="number_desc">输入两个数字（上卦与下卦），直接起卦预测。</p>
             <div class="input-group">
                 <input type="number" id="num1" placeholder="上卦 (Upper)" data-i18n-placeholder="upper_num_placeholder">
@@ -50,7 +65,10 @@
 
         <!-- 4. Random -->
         <div class="card">
-            <h2 data-i18n="random_title">随机起卦</h2>
+            <div class="card-header">
+                <h2 data-i18n="random_title">随机起卦</h2>
+                <div class="help-btn" data-module="random">?</div>
+            </div>
             <p data-i18n="random_desc">心诚则灵，随机抽取六爻卦象，解答心中疑惑。</p>
             <button onclick="divineRandom()" data-i18n="divine_btn">立即测算</button>
             <div id="randomResult" class="result-area"></div>
@@ -58,7 +76,10 @@
 
         <!-- 5. Current Time -->
         <div class="card">
-            <h2 data-i18n="time_title">当前时间起卦</h2>
+            <div class="card-header">
+                <h2 data-i18n="time_title">当前时间起卦</h2>
+                <div class="help-btn" data-module="time">?</div>
+            </div>
             <p data-i18n="time_desc">以当前年月日时为基准，感应天时地利。</p>
             <button onclick="divineCurrent()" data-i18n="divine_btn">立即测算</button>
             <div id="currentResult" class="result-area"></div>
@@ -66,7 +87,10 @@
         
          <!-- 6. Ziwei Dou Shu -->
         <div class="card">
-            <h2 data-i18n="ziwei_title">紫微斗数 (排盘)</h2>
+            <div class="card-header">
+                <h2 data-i18n="ziwei_title">紫微斗数 (排盘)</h2>
+                <div class="help-btn" data-module="ziwei">?</div>
+            </div>
             <p data-i18n="ziwei_desc">输入出生时间，排出紫微命盘 (仅供参考)。</p>
             <div class="input-group">
                 <input type="number" id="year" placeholder="年 (Year)" style="width: 25%">
@@ -80,7 +104,10 @@
 
         <!-- 7. Bazi Analysis -->
         <div class="card">
-            <h2 data-i18n="bazi_title">八字算命 (四柱分析)</h2>
+            <div class="card-header">
+                <h2 data-i18n="bazi_title">八字算命 (四柱分析)</h2>
+                <div class="help-btn" data-module="bazi">?</div>
+            </div>
             <p data-i18n="bazi_desc">输入出生时间，分析八字命盘、五行喜忌及日主强弱。</p>
             <div class="input-group">
                 <input type="number" id="bazi_year" placeholder="年 (Year)" style="width: 25%">
@@ -94,7 +121,10 @@
 
         <!-- 8. Marriage Compatibility -->
         <div class="card">
-            <h2 data-i18n="match_title">八字合婚 (姻缘匹配)</h2>
+            <div class="card-header">
+                <h2 data-i18n="match_title">八字合婚 (姻缘匹配)</h2>
+                <div class="help-btn" data-module="match">?</div>
+            </div>
             <p data-i18n="match_desc">输入双方出生时间，测算婚姻匹配度、生肖合冲及五行互补。</p>
             <div class="subtitle-small" data-i18n="male_info">男方信息 (Male)</div>
             <div class="input-group">
@@ -128,18 +158,96 @@
                     <img src="alipay.png" alt="Alipay">
                     <span data-i18n="alipay">支付宝</span>
                 </div>
+                <div class="qr-item">
+                    <a href="https://www.paypal.com/paypalme/sugarworm" target="_blank" class="paypal-link">
+                        <img src="paypal.png" alt="PayPal">
+                    </a>
+                    <span data-i18n="paypal">PayPal</span>
+                </div>
             </div>
         </div>
 
     </div>
 
     <footer>
-        &copy; 2024 Zhouyi Divination System. All rights reserved.
+        &copy; 2026 Zhouyi Divination System. All rights reserved. | Email: 70334174@qq.com
     </footer>
 
     <script>
         const API_BASE = "/api/divine";
         let currentLang = 'zh';
+        
+        // Help Content (Bilingual)
+        const helpContent = {
+            zh: {
+                text: {
+                    title: "公司/姓名/号码测吉凶",
+                    text: "基于《梅花易数》的原理，将汉字、数字或英文转化为卦象。适用于分析公司名称、个人姓名、车牌号、手机号等所蕴含的能量场，判断其吉凶趋势。"
+                },
+                zhuge: {
+                    title: "诸葛神数 (384签)",
+                    text: "相传为诸葛亮所作，共384签，对应《易经》384爻。输入三个字（心动即占），通过笔画数理求取神签，签文多为诗句，富含哲理与预示。"
+                },
+                number: {
+                    title: "数字起卦",
+                    text: "最直接的梅花易数起卦法。凭直觉输入两个数字，第一个数为上卦（代表外在、天），第二个数为下卦（代表内在、地），结合成卦以断吉凶。"
+                },
+                random: {
+                    title: "随机起卦",
+                    text: "模拟传统的铜钱起卦法（六爻）。心中默念问题，点击测算，程序会模拟抛掷三次铜钱，重复六次生成六爻卦象，适合解答具体的疑问。"
+                },
+                time: {
+                    title: "当前时间起卦",
+                    text: "“不动不占，无事不占”。利用当前的年、月、日、时作为变量起卦。这种方法强调“天人合一”，认为特定时刻的卦象能反映当下的运势。"
+                },
+                ziwei: {
+                    title: "紫微斗数 (排盘)",
+                    text: "中国传统命理学之首，被称为“帝王之学”。依据出生时间排出命盘，包含十二宫（命宫、财帛、官禄等）及一百多颗星曜，详尽分析人生格局。"
+                },
+                bazi: {
+                    title: "八字算命 (四柱)",
+                    text: "将出生时间转化为天干地支（四柱八字），分析五行（金木水火土）的旺衰与平衡，找出“日主”（代表自己）的喜忌，从而推断一生的运势起伏。"
+                },
+                match: {
+                    title: "八字合婚",
+                    text: "通过对比男女双方的八字，分析生肖是否相冲、日元是否相合、五行是否互补。旨在判断两人缘分深浅及婚后生活的和谐程度。"
+                }
+            },
+            en: {
+                text: {
+                    title: "Name/Text Analysis",
+                    text: "Wondering if a name, company name, or phone number brings good luck? Just type it here. We use ancient I Ching mathematics to calculate its hidden energy and reveal if it's auspicious or if there are challenges ahead."
+                },
+                zhuge: {
+                    title: "Zhuge Fortune (384 Lots)",
+                    text: "A traditional fortune-telling method attributed to the legendary strategist Zhuge Liang. Enter three Chinese characters (or English words, we'll convert them) to draw a 'Lot' that gives you a poetic prediction about your future."
+                },
+                number: {
+                    title: "Number Divination",
+                    text: "Trust your intuition and pick two numbers. The first number represents the 'Upper Trigram' (Heaven/External), and the second is the 'Lower Trigram' (Earth/Internal). Together they form a Hexagram that answers your specific question."
+                },
+                random: {
+                    title: "Random Divination",
+                    text: "Focus on a question in your mind. When you're ready, click the button. We virtually cast 3 coins 6 times to build your Hexagram. This is the most traditional way to ask the I Ching for guidance."
+                },
+                time: {
+                    title: "Current Time Divination",
+                    text: "What is the universe saying *right now*? This method uses the exact current date and time to calculate a Hexagram. It captures the unique energy of this specific moment in time."
+                },
+                ziwei: {
+                    title: "Ziwei Dou Shu (Astrology)",
+                    text: "Think of this as Chinese Astrology. By entering your birth time, we generate a complex 'Star Chart'. It maps out your destiny across 12 'Palaces' representing Life, Career, Wealth, Love, etc. (Note: Interpretation requires study)."
+                },
+                bazi: {
+                    title: "Bazi (Four Pillars)",
+                    text: "Your 'Life DNA' code. We analyze the year, month, day, and hour you were born to find your 'Day Master' (your core self) and the balance of the Five Elements (Gold, Wood, Water, Fire, Earth) in your life."
+                },
+                match: {
+                    title: "Love Compatibility",
+                    text: "Are you soulmates? Enter both birthdays to check your spiritual compatibility. We analyze if your elements harmonize (good for marriage) or clash (challenges ahead) based on ancient Bazi principles."
+                }
+            }
+        };
 
         const translations = {
             zh: {
@@ -176,7 +284,8 @@
                 donation_title: "随喜打赏",
                 donation_desc: "如果您觉得本站对您有帮助，欢迎随喜打赏支持。",
                 wechat_pay: "微信支付",
-                alipay: "支付宝"
+                alipay: "支付宝",
+                paypal: "PayPal (国际)"
             },
             en: {
                 title: "Zhouyi Divination",
@@ -212,7 +321,8 @@
                 donation_title: "Donation",
                 donation_desc: "If you find this site helpful, feel free to donate.",
                 wechat_pay: "WeChat Pay",
-                alipay: "Alipay"
+                alipay: "Alipay",
+                paypal: "PayPal"
             }
         };
 
@@ -238,7 +348,47 @@
                     el.placeholder = translations[lang][key];
                 }
             });
+            
+            // Show/Hide Help Buttons based on Language
+            const helpBtns = document.querySelectorAll('.help-btn');
+            helpBtns.forEach(btn => {
+                // Always show buttons now
+                btn.style.display = 'block';
+            });
         }
+        
+        // Tooltip Functions
+        const tooltip = document.getElementById('helpTooltip');
+        const helpBtns = document.querySelectorAll('.help-btn');
+        
+        helpBtns.forEach(btn => {
+            btn.addEventListener('mouseenter', (e) => {
+                const moduleKey = btn.getAttribute('data-module');
+                // Get content based on currentLang
+                const content = helpContent[currentLang][moduleKey];
+                
+                if (content) {
+                    document.getElementById('tooltipTitle').innerText = content.title;
+                    document.getElementById('tooltipText').innerText = content.text;
+                    
+                    // Position Tooltip
+                    const rect = btn.getBoundingClientRect();
+                    tooltip.style.left = (rect.right + 10) + 'px';
+                    tooltip.style.top = (rect.top - 10) + 'px';
+                    
+                    // Check if overflow right
+                    if (rect.right + 310 > window.innerWidth) {
+                        tooltip.style.left = (rect.left - 310) + 'px';
+                    }
+                    
+                    tooltip.classList.add('active');
+                }
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                tooltip.classList.remove('active');
+            });
+        });
 
         async function showResult(elementId, text) {
             const el = document.getElementById(elementId);
