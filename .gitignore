@@ -13,3 +13,6 @@ find_*.py
 inspect_*.py
 reproduce_issue.py
 test_*.py
+
+# Local Archive (Not for GitHub)
+local_archive/
