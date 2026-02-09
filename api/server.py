@@ -24,6 +24,16 @@ import ziwei
 import bazi
 import os
 
+# Fix imports for Vercel environment where files are side-by-side in api/
+try:
+    import utils
+    import ziwei
+    import bazi
+except ImportError:
+    from . import utils
+    from . import ziwei
+    from . import bazi
+
 app = FastAPI(title="Zhouyi Divination API")
 
 # CORS
