@@ -151,8 +151,8 @@ async def divine_match(req: MatchRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 # Static Files
-# Create static directory if not exists
-static_dir = os.path.join(os.path.dirname(__file__), "static")
+# Create public directory if not exists
+static_dir = os.path.join(os.path.dirname(__file__), "public")
 if not os.path.exists(static_dir):
     os.makedirs(static_dir)
 
