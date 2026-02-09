@@ -5,3 +5,11 @@ __pycache__/
 env/
 venv/
 *.log
+
+# Temp scripts
+check_*.py
+extract_*.py
+find_*.py
+inspect_*.py
+reproduce_issue.py
+test_*.py

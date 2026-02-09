@@ -3,6 +3,7 @@ from ichingshifa import ichingshifa
 import json
 import os
 from strokes import strokes
+import re
 
 # Load Zhuge Data
 ZHUGE_DATA = []
@@ -48,6 +49,27 @@ HEX_EN = {
     "巽为风": "The Gentle", "兑为泽": "The Joyous", "风水涣": "Dispersion", "水泽节": "Limitation",
     "风泽中孚": "Inner Truth", "雷山小过": "Preponderance of the Small", "水火既济": "After Completion", "火水未济": "Before Completion"
 }
+
+NAME_TO_INDEX = {
+    "乾": 1, "坤": 2, "屯": 3, "蒙": 4, "需": 5, "讼": 6, "师": 7, "比": 8,
+    "小畜": 9, "履": 10, "泰": 11, "否": 12, "同人": 13, "大有": 14, "谦": 15, "豫": 16,
+    "随": 17, "蛊": 18, "临": 19, "观": 20, "噬嗑": 21, "贲": 22, "剥": 23, "复": 24,
+    "无妄": 25, "大畜": 26, "颐": 27, "大过": 28, "坎": 29, "离": 30, "咸": 31, "恒": 32,
+    "遯": 33, "大壮": 34, "晋": 35, "明夷": 36, "家人": 37, "睽": 38, "蹇": 39, "解": 40,
+    "损": 41, "益": 42, "夬": 43, "姤": 44, "萃": 45, "升": 46, "困": 47, "井": 48,
+    "革": 49, "鼎": 50, "震": 51, "艮": 52, "渐": 53, "归妹": 54, "丰": 55, "旅": 56,
+    "巽": 57, "兑": 58, "涣": 59, "节": 60, "中孚": 61, "小过": 62, "既济": 63, "未济": 64
+}
+
+# Load English Yi Jing Data
+YI_JING_EN = {}
+yijing_file = os.path.join(os.path.dirname(__file__), "yi_jing_en.json")
+if os.path.exists(yijing_file):
+    try:
+        with open(yijing_file, "r", encoding="utf-8") as f:
+            YI_JING_EN = json.load(f)
+    except:
+        pass
 
 def get_strokes(char):
     if char.isdigit():
@@ -246,10 +268,39 @@ def calculate_hexagram_from_numbers(upper_val, lower_val, total_val=None):
     
     # Summary Translation
     summary_en = response["summary"]
-    summary_en = summary_en.replace("吉", "Auspicious").replace("凶", "Ominous").replace("悔", "Regret").replace("吝", "Stingy/Small Trouble")
+    
+    # Match pattern: 動爻有【1】根。 【家人之同人】
+    match = re.search(r"動爻有【(\d+)】根。[ \t]*【(.*?)之(.*?)】", summary_en)
+    if match:
+        count = match.group(1)
+        hex1 = match.group(2)
+        hex2 = match.group(3)
+        hex1_en = get_hex_en(hex1)
+        hex2_en = get_hex_en(hex2)
+        summary_en = f"Moving Lines: {count}. {hex1_en} -> {hex2_en}"
+    else:
+        summary_en = summary_en.replace("吉", "Auspicious").replace("凶", "Ominous").replace("悔", "Regret").replace("吝", "Stingy/Small Trouble")
+        
     response["summary_en"] = summary_en
     
-    response["main_text_en"] = "(Classical text translation unavailable)"
+    # Populate English Text from YI_JING_EN
+    ben_gua_name = result[1]
+    hex_idx = NAME_TO_INDEX.get(ben_gua_name)
+    
+    if hex_idx:
+        en_data = YI_JING_EN.get(str(hex_idx))
+        if en_data:
+            response["ben_gua_text_en"] = en_data.get("judgement", "")
+            
+            line_text_en = en_data.get("lines", {}).get(str(moving_yao), "")
+            if line_text_en:
+                response["main_text_en"] = line_text_en
+            else:
+                response["main_text_en"] = "(English line text unavailable)"
+        else:
+            response["main_text_en"] = "(Classical text translation unavailable)"
+    else:
+        response["main_text_en"] = "(Classical text translation unavailable)"
     
     return response
 
@@ -278,9 +329,60 @@ def get_random_divination():
         response["ben_gua_en"] = get_hex_en(response["ben_gua"])
         response["zhi_gua_en"] = get_hex_en(response["zhi_gua"])
         summary_en = response["summary"]
-        summary_en = summary_en.replace("吉", "Auspicious").replace("凶", "Ominous")
+        
+        match = re.search(r"動爻有【(\d+)】根。[ \t]*【(.*?)之(.*?)】", summary_en)
+        if match:
+            count = match.group(1)
+            hex1 = match.group(2)
+            hex2 = match.group(3)
+            hex1_en = get_hex_en(hex1)
+            hex2_en = get_hex_en(hex2)
+            summary_en = f"Moving Lines: {count}. {hex1_en} -> {hex2_en}"
+        else:
+            summary_en = summary_en.replace("吉", "Auspicious").replace("凶", "Ominous")
+            
         response["summary_en"] = summary_en
-        response["main_text_en"] = "(Classical text translation unavailable)"
+        
+        # Populate English Text
+        ben_gua_name = response["ben_gua"]
+        hex_idx = NAME_TO_INDEX.get(ben_gua_name)
+        
+        if hex_idx:
+            en_data = YI_JING_EN.get(str(hex_idx))
+            if en_data:
+                response["ben_gua_text_en"] = en_data.get("judgement", "")
+                
+                # Identify moving lines from code
+                # code is in result[0] ? No, result[0] is not passed in response.
+                # But result[0] is code?
+                # In calculate_hexagram_from_numbers, result = iching.mget_bookgua_details(final_code)
+                # In get_random_divination, result = iching.bookgua_details()
+                # result[0] is the code string (e.g. "776789")
+                
+                code = result[0]
+                moving_lines = []
+                for i, char in enumerate(code):
+                    if char in ['6', '9']:
+                        moving_lines.append(i + 1)
+                
+                if moving_lines:
+                    texts = []
+                    for line_idx in moving_lines:
+                        text = en_data.get("lines", {}).get(str(line_idx), "")
+                        if text:
+                            texts.append(text)
+                    response["main_text_en"] = "\n".join(texts) if texts else "(English line text unavailable)"
+                else:
+                    # No moving lines, usually use Judgement or Tuan?
+                    # Or maybe use Thuan text (Judgement) as main text?
+                    # In Chinese tradition, if no moving lines, use Ben Gua Tuan.
+                    # which is already in ben_gua_text_en.
+                    # So main_text_en can be empty or same as Judgement.
+                    response["main_text_en"] = en_data.get("judgement", "")
+            else:
+                response["main_text_en"] = "(Classical text translation unavailable)"
+        else:
+            response["main_text_en"] = "(Classical text translation unavailable)"
     
     return response
 
