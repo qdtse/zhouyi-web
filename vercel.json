@@ -2,11 +2,13 @@
     "rewrites": [
         {
             "source": "/api/(.*)",
-            "destination": "/api/index.py"
-        },
-        {
-            "source": "/(.*)",
-            "destination": "/public/$1"
+            "destination": "/api/index"
         }
-    ]
+    ],
+    "functions": {
+        "api/index.py": {
+            "memory": 1024,
+            "maxDuration": 10
+        }
+    }
 }

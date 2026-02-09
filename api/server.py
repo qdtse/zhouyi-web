@@ -14,25 +14,37 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import sys
+import os
+
+# Add current directory to path for imports
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
 from fastapi import FastAPI, HTTPException
-from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
-import utils
-import ziwei
-import bazi
-import os
 
-# Fix imports for Vercel environment where files are side-by-side in api/
+# Import local modules with error handling
 try:
     import utils
+except Exception as e:
+    print(f"Error importing utils: {e}", file=sys.stderr)
+    utils = None
+
+try:
     import ziwei
+except Exception as e:
+    print(f"Error importing ziwei: {e}", file=sys.stderr)
+    ziwei = None
+
+try:
     import bazi
-except ImportError:
-    from . import utils
-    from . import ziwei
-    from . import bazi
+except Exception as e:
+    print(f"Error importing bazi: {e}", file=sys.stderr)
+    bazi = None
 
 app = FastAPI(title="Zhouyi Divination API")
 
@@ -83,7 +95,14 @@ class MatchRequest(BaseModel):
 
 @app.get("/api/health")
 async def health_check():
-    return {"status": "ok"}
+    return {
+        "status": "ok",
+        "modules": {
+            "utils": utils is not None,
+            "ziwei": ziwei is not None,
+            "bazi": bazi is not None
+        }
+    }
 
 @app.post("/api/divine/text")
 async def divine_text(req: TextRequest):
@@ -91,6 +110,8 @@ async def divine_text(req: TextRequest):
     Handles: Company Naming, Name Testing, Phone Number, License Plate, English Name
     Supports focus: general, love, wealth, career
     """
+    if utils is None:
+        raise HTTPException(status_code=503, detail="Utils module not available")
     try:
         result = utils.calculate_hexagram_from_text(req.text, req.focus)
         return result
@@ -102,6 +123,8 @@ async def divine_zhuge(req: TextRequest):
     """
     Handles: Zhuge Shenshu Divination
     """
+    if utils is None:
+        raise HTTPException(status_code=503, detail="Utils module not available")
     try:
         result = utils.calculate_zhuge_from_text(req.text)
         return result
@@ -113,6 +136,8 @@ async def divine_pair(req: PairRequest):
     """
     Handles explicit number pairs
     """
+    if utils is None:
+        raise HTTPException(status_code=503, detail="Utils module not available")
     try:
         result = utils.calculate_hexagram_from_numbers(req.num1, req.num2)
         return result
@@ -124,6 +149,8 @@ async def divine_random():
     """
     Handles Random Divination
     """
+    if utils is None:
+        raise HTTPException(status_code=503, detail="Utils module not available")
     try:
         result = utils.get_random_divination()
         return result
@@ -135,6 +162,8 @@ async def divine_current():
     """
     Handles Current Time Divination
     """
+    if utils is None:
+        raise HTTPException(status_code=503, detail="Utils module not available")
     try:
         result = utils.get_current_time_divination()
         return result
@@ -146,6 +175,8 @@ async def divine_ziwei(req: ZiweiRequest):
     """
     Handles: Ziwei Doushu Chart
     """
+    if ziwei is None:
+        raise HTTPException(status_code=503, detail="Ziwei module not available")
     try:
         chart = ziwei.ZiweiChart(req.year, req.month, req.day, req.hour)
         return chart.json()
@@ -157,6 +188,8 @@ async def divine_bazi(req: BaziRequest):
     """
     Handles: Bazi Analysis (Eight Characters)
     """
+    if bazi is None:
+        raise HTTPException(status_code=503, detail="Bazi module not available")
     try:
         result = bazi.get_bazi_analysis(req.year, req.month, req.day, req.hour)
         return result
@@ -168,6 +201,8 @@ async def divine_match(req: MatchRequest):
     """
     Handles: Bazi Marriage Compatibility
     """
+    if bazi is None:
+        raise HTTPException(status_code=503, detail="Bazi module not available")
     try:
         male = bazi.get_bazi_analysis(req.male_year, req.male_month, req.male_day, req.male_hour)
         female = bazi.get_bazi_analysis(req.female_year, req.female_month, req.female_day, req.female_hour)
@@ -176,16 +211,8 @@ async def divine_match(req: MatchRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Static Files - REMOVED
-# We let Vercel handle static files serving directly from the public/ directory
-# This avoids "Read-only file system" errors in Serverless environment
-
 if __name__ == "__main__":
     import uvicorn
-    # For local development, we can mount static files conditionally
-    # But for Vercel deployment, we rely on vercel.json rewrites
-    static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "public")
-    if os.path.exists(static_dir):
-        app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
-    
+    # For local development only
+    # Vercel handles static files via vercel.json routes
     uvicorn.run(app, host="0.0.0.0", port=8000)
