@@ -168,7 +168,8 @@ async def divine_match(req: MatchRequest):
 
 # Static Files
 # Create public directory if not exists
-static_dir = os.path.join(os.path.dirname(__file__), "public")
+# Go up one level to find public directory since server.py is in api/
+static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "public")
 if not os.path.exists(static_dir):
     os.makedirs(static_dir)
 
