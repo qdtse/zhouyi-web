@@ -10,6 +10,7 @@
     <div class="lang-switch">
         <button class="lang-btn active" onclick="setLang('zh')">中文</button>
         <button class="lang-btn" onclick="setLang('en')">English</button>
+        <button class="lang-btn" onclick="setLang('fr')">Français</button>
     </div>
 
     <header>
@@ -246,6 +247,40 @@
                     title: "Love Compatibility",
                     text: "Are you soulmates? Enter both birthdays to check your spiritual compatibility. We analyze if your elements harmonize (good for marriage) or clash (challenges ahead) based on ancient Bazi principles."
                 }
+            },
+            fr: {
+                text: {
+                    title: "Analyse de Nom/Texte",
+                    text: "Vous demandez-vous si un nom, une entreprise ou un numéro de téléphone porte chance ? Tapez-le ici. Nous utilisons les mathématiques anciennes du Yi Jing pour calculer son énergie cachée et révéler si elle est de bon augure."
+                },
+                zhuge: {
+                    title: "Oracle de Zhuge (384 Lots)",
+                    text: "Une méthode traditionnelle attribuée au stratège légendaire Zhuge Liang. Entrez trois caractères chinois (ou mots) pour tirer un 'Lot' qui vous donne une prédiction poétique sur votre avenir."
+                },
+                number: {
+                    title: "Divination par les Nombres",
+                    text: "Faites confiance à votre intuition et choisissez deux nombres. Le premier représente le 'Trigramme Supérieur' (Ciel/Extérieur), et le second le 'Trigramme Inférieur' (Terre/Intérieur). Ensemble, ils forment un Hexagramme qui répond à votre question."
+                },
+                random: {
+                    title: "Divination Aléatoire",
+                    text: "Concentrez-vous sur une question. Quand vous êtes prêt, cliquez sur le bouton. Nous lançons virtuellement 3 pièces 6 fois pour construire votre Hexagramme. C'est la méthode la plus traditionnelle pour consulter le Yi Jing."
+                },
+                time: {
+                    title: "Divination par l'Heure Actuelle",
+                    text: "Que dit l'univers *maintenant* ? Cette méthode utilise la date et l'heure exactes pour calculer un Hexagramme. Elle capture l'énergie unique de ce moment précis."
+                },
+                ziwei: {
+                    title: "Ziwei Dou Shu (Astrologie)",
+                    text: "Considérez cela comme l'astrologie chinoise. En entrant votre heure de naissance, nous générons une 'Carte des Étoiles' complexe. Elle trace votre destin à travers 12 'Palais' représentant la Vie, la Carrière, la Richesse, l'Amour, etc."
+                },
+                bazi: {
+                    title: "Bazi (Quatre Piliers)",
+                    text: "Votre code 'ADN de Vie'. Nous analysons l'année, le mois, le jour et l'heure de votre naissance pour trouver votre 'Maître du Jour' (votre moi profond) et l'équilibre des Cinq Éléments (Or, Bois, Eau, Feu, Terre) dans votre vie."
+                },
+                match: {
+                    title: "Compatibilité Amoureuse",
+                    text: "Êtes-vous âmes sœurs ? Entrez les deux dates de naissance pour vérifier votre compatibilité spirituelle. Nous analysons si vos éléments s'harmonisent (bon pour le mariage) ou s'affrontent, basé sur les principes anciens du Bazi."
+                }
             }
         };
 
@@ -323,6 +358,52 @@
                 wechat_pay: "WeChat Pay",
                 alipay: "Alipay",
                 paypal: "PayPal"
+            },
+            fr: {
+                text_divination_title: "Analyse de Nom/Entreprise",
+                text_divination_desc: "Entrez un texte, un nom ou des chiffres pour analyser l'énergie cachée.",
+                text_placeholder: "Entrez le texte ici",
+                
+                zhuge_title: "Oracle de Zhuge (384 Lots)",
+                zhuge_desc: "Entrez 3 caractères pour obtenir une prédiction poétique.",
+                zhuge_placeholder: "Entrez 3 caractères",
+                
+                number_title: "Divination par les Nombres",
+                number_desc: "Entrez deux nombres pour former un hexagramme.",
+                upper_num_placeholder: "Haut (Ciel)",
+                lower_num_placeholder: "Bas (Terre)",
+                
+                random_title: "Divination Aléatoire",
+                random_desc: "Concentrez-vous sur votre question et lancez les pièces virtuelles.",
+                
+                time_title: "Divination par l'Heure",
+                time_desc: "Utilisez le moment présent pour la divination.",
+                
+                ziwei_title: "Ziwei Dou Shu (Thème Astral)",
+                ziwei_desc: "Entrez votre date de naissance pour générer votre thème astral.",
+                
+                bazi_title: "Analyse Bazi (Quatre Piliers)",
+                bazi_desc: "Analysez votre destin basé sur les Cinq Éléments.",
+                
+                match_title: "Compatibilité Amoureuse",
+                match_desc: "Vérifiez la compatibilité entre deux personnes.",
+                male_info: "Homme",
+                female_info: "Femme",
+                
+                divine_btn: "Divination",
+                result_label: "【Résultat】",
+                
+                input_error: "Veuillez entrer une valeur valide",
+                input_error_zhuge: "Veuillez entrer 3 caractères",
+                input_error_num: "Veuillez entrer deux nombres",
+                input_error_date: "Veuillez entrer une date valide",
+                error_label: "Erreur: ",
+                
+                donation_title: "Faire un Don",
+                donation_desc: "Si ce site vous est utile, n'hésitez pas à faire un don.",
+                wechat_pay: "WeChat Pay",
+                alipay: "Alipay",
+                paypal: "PayPal"
             }
         };
 
@@ -330,7 +411,7 @@
             currentLang = lang;
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.classList.remove('active');
-                if (btn.innerText === (lang === 'zh' ? '中文' : 'English')) {
+                if (btn.innerText === (lang === 'zh' ? '中文' : (lang === 'en' ? 'English' : 'Français'))) {
                     btn.classList.add('active');
                 }
             });
@@ -411,10 +492,12 @@
                 const data = await res.json();
                 
                 let display = "";
-                if (currentLang === 'en' && data.ben_gua_en) {
-                     display = `Hexagram: ${data.ben_gua_en} -> ${data.zhi_gua_en}\nSummary: ${data.summary_en}\n\n${data.main_text_en || data.main_text}`;
+                if (currentLang === 'en') {
+                    display = `Original Hexagram (Ben Gua): ${data.ben_gua} (${data.ben_gua_en})\n${data.ben_gua_text_en}\n\nTarget Hexagram (Zhi Gua): ${data.zhi_gua} (${data.zhi_gua_en})\n\nMain Text (Interpretation):\n${data.main_text_en}\n\nSummary:\n${data.summary}`;
+                } else if (currentLang === 'fr') {
+                    display = `Hexagramme Original (Ben Gua): ${data.ben_gua} (${data.ben_gua_fr})\n${data.ben_gua_text_fr}\n\nHexagramme Cible (Zhi Gua): ${data.zhi_gua} (${data.zhi_gua_fr})\n\nTexte Principal (Interprétation):\n${data.main_text_fr}\n\nRésumé:\n${data.summary_fr}`;
                 } else {
-                     display = `卦象: ${data.ben_gua} 之 ${data.zhi_gua}\n断语: ${data.summary}\n\n${data.main_text}\n\n${data.ben_gua_text}`;
+                    display = `本卦: ${data.ben_gua}\n${data.ben_gua_text}\n\n之卦: ${data.zhi_gua}\n\n【断语】\n${data.main_text}\n\n【变卦摘要】\n${data.summary}`;
                 }
                 
                 showResult('textResult', display);
@@ -440,6 +523,8 @@
                 let display = "";
                 if (currentLang === 'en') {
                     display = `Lot No: ${data.index}\nPoem: ${data.poem_en || data.poem}\nExplanation: ${data.explain_en || data.explain}`;
+                } else if (currentLang === 'fr') {
+                    display = `Lot N°: ${data.index}\nPoème: ${data.poem_en || data.poem}\nExplication: ${data.explain_en || data.explain}`;
                 } else {
                     display = `签号: ${data.index}\n签诗: ${data.poem}\n解签: ${data.explain}`;
                 }
@@ -468,6 +553,8 @@
                 let display = "";
                  if (currentLang === 'en' && data.ben_gua_en) {
                      display = `Hexagram: ${data.ben_gua_en} -> ${data.zhi_gua_en}\nSummary: ${data.summary_en}\n\n${data.main_text_en || data.main_text}`;
+                } else if (currentLang === 'fr') {
+                     display = `Hexagramme: ${data.ben_gua_fr || data.ben_gua_en} -> ${data.zhi_gua_fr || data.zhi_gua_en}\nRésumé: ${data.summary_fr || data.summary_en}\n\n${data.main_text_fr || data.main_text_en || data.main_text}`;
                 } else {
                      display = `卦象: ${data.ben_gua} 之 ${data.zhi_gua}\n断语: ${data.summary}\n\n${data.main_text}\n\n${data.ben_gua_text}`;
                 }
@@ -485,6 +572,8 @@
                  let display = "";
                  if (currentLang === 'en' && data.ben_gua_en) {
                      display = `Hexagram: ${data.ben_gua_en} -> ${data.zhi_gua_en}\nSummary: ${data.summary_en}\n\n${data.main_text_en || data.main_text}`;
+                } else if (currentLang === 'fr') {
+                     display = `Hexagramme: ${data.ben_gua_fr || data.ben_gua_en} -> ${data.zhi_gua_fr || data.zhi_gua_en}\nRésumé: ${data.summary_fr || data.summary_en}\n\n${data.main_text_fr || data.main_text_en || data.main_text}`;
                 } else {
                      display = `卦象: ${data.ben_gua} 之 ${data.zhi_gua}\n断语: ${data.summary}\n\n${data.main_text}\n\n${data.ben_gua_text}`;
                 }
@@ -501,6 +590,8 @@
                 let display = "";
                 if (currentLang === 'en') {
                      display = `Time Hexagram: ${data.gua_name}\nMoving Yao: ${data.moving_yao_info}\nText: ${data.main_text}`;
+                } else if (currentLang === 'fr') {
+                     display = `Hexagramme Temporel: ${data.gua_name}\nYao Mobile: ${data.moving_yao_info}\nTexte: ${data.main_text}`;
                 } else {
                      display = `时间卦: ${data.gua_name}\n变爻: ${data.moving_yao_info}\n爻辞: ${data.main_text}`;
                 }
@@ -567,6 +658,8 @@
                 if (currentLang === 'en') {
                     // Simple EN display (though backend returns mostly Chinese terms)
                     display = `Solar: ${data.solar}\nLunar: ${data.lunar}\n\nBazi (Four Pillars):\n${data.bazi.join(' ')}\n\nDay Master: ${data.day_master.gan} (${data.day_master.wuxing}) - Strength: ${data.day_master.strength}\n\nFive Elements: ${JSON.stringify(data.wuxing_counts)}`;
+                } else if (currentLang === 'fr') {
+                     display = `Solaire: ${data.solar}\nLunaire: ${data.lunar}\n\nBazi (Quatre Piliers):\n${data.bazi.join(' ')}\n\nMaître du Jour: ${data.day_master.gan} (${data.day_master.wuxing}) - Force: ${data.day_master.strength}\n\nCinq Éléments: ${JSON.stringify(data.wuxing_counts)}`;
                 } else {
                     display = `阳历: ${data.solar}\n阴历: ${data.lunar}\n\n【八字排盘】\n${data.bazi.join('  ')}\n\n【日元分析】\n日主: ${data.day_master.gan} (${data.day_master.wuxing})\n强弱: ${data.day_master.strength} (${data.day_master.month_relation})\n\n【五行统计】\n${JSON.stringify(data.wuxing_counts).replace(/"/g, '').replace(/{/g, '').replace(/}/g, '').replace(/,/g, ', ')}\n缺: ${data.missing_wuxing.length > 0 ? data.missing_wuxing.join(',') : '无'}`;
                 }
@@ -607,6 +700,8 @@
                 let display = "";
                 if (currentLang === 'en') {
                     display = `Score: ${data.score}\nLevel: ${data.level}\n\nAnalysis:\n${data.analysis.join('\n')}`;
+                } else if (currentLang === 'fr') {
+                    display = `Score: ${data.score}\nNiveau: ${data.level}\n\nAnalyse:\n${data.analysis.join('\n')}`;
                 } else {
                     display = `【合婚评分】 ${data.score} 分\n【婚姻等级】 ${data.level}\n\n【详细分析】\n${data.analysis.join('\n')}\n\n男方八字: ${data.male_info.bazi}\n女方八字: ${data.female_info.bazi}`;
                 }

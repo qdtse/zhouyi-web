@@ -96,6 +96,16 @@ if os.path.exists(yijing_file):
     except:
         pass
 
+# Load French Yi Jing Data
+YI_JING_FR = {}
+yijing_fr_file = os.path.join(os.path.dirname(__file__), "yi_jing_fr.json")
+if os.path.exists(yijing_fr_file):
+    try:
+        with open(yijing_fr_file, "r", encoding="utf-8") as f:
+            YI_JING_FR = json.load(f)
+    except:
+        pass
+
 def get_strokes(char):
     if char.isdigit():
         return int(char)
@@ -413,8 +423,48 @@ def calculate_hexagram_from_numbers(upper_val, lower_val, total_val=None, focus=
                 response["main_text_en"] = "(English line text unavailable)"
         else:
             response["main_text_en"] = "(Classical text translation unavailable)"
+            
+        # Populate French Text
+        fr_data = YI_JING_FR.get(str(hex_idx))
+        if fr_data:
+            response["ben_gua_fr"] = fr_data.get("name", ben_gua_name)
+            # French Judgement
+            response["ben_gua_text_fr"] = fr_data.get("judgement", "")
+            
+            # French Line
+            line_text_fr = fr_data.get("lines", {}).get(str(moving_yao), "")
+            if line_text_fr:
+                response["main_text_fr"] = line_text_fr
+            else:
+                response["main_text_fr"] = "(Texte français indisponible)"
+        else:
+            response["ben_gua_fr"] = ben_gua_name
+            response["main_text_fr"] = "(Traduction française indisponible)"
+            
+        # Zhi Gua Name FR
+        zhi_gua_name = result[2]
+        zhi_idx = NAME_TO_INDEX.get(zhi_gua_name)
+        if zhi_idx and str(zhi_idx) in YI_JING_FR:
+            response["zhi_gua_fr"] = YI_JING_FR[str(zhi_idx)]["name"]
+        else:
+            response["zhi_gua_fr"] = zhi_gua_name
+            
+        # Summary FR (Simple translation)
+        # "Moving Lines: X. Hex1 -> Hex2"
+        # "Traits mobiles: X. Hex1 -> Hex2"
+        if match:
+            hex1_fr = response.get("ben_gua_fr", hex1)
+            hex2_fr = response.get("zhi_gua_fr", hex2)
+            response["summary_fr"] = f"Traits mobiles: {count}. {hex1_fr} -> {hex2_fr}"
+        else:
+            # Simple replacements
+            summary_fr = response["summary"]
+            summary_fr = summary_fr.replace("吉", "Faste (Bon)").replace("凶", "Néfaste (Mauvais)").replace("悔", "Regret").replace("吝", "Petit souci")
+            response["summary_fr"] = summary_fr
+
     else:
         response["main_text_en"] = "(Classical text translation unavailable)"
+        response["main_text_fr"] = "(Traduction française indisponible)"
     
     return response
 
@@ -495,8 +545,53 @@ def get_random_divination():
                     response["main_text_en"] = en_data.get("judgement", "")
             else:
                 response["main_text_en"] = "(Classical text translation unavailable)"
+                
+            # Populate French Text
+            fr_data = YI_JING_FR.get(str(hex_idx))
+            if fr_data:
+                response["ben_gua_fr"] = fr_data.get("name", ben_gua_name)
+                response["ben_gua_text_fr"] = fr_data.get("judgement", "")
+                
+                # Moving lines FR
+                code = result[0]
+                moving_lines = []
+                for i, char in enumerate(code):
+                    if char in ['6', '9']:
+                        moving_lines.append(i + 1)
+                        
+                if moving_lines:
+                    texts = []
+                    for line_idx in moving_lines:
+                        text = fr_data.get("lines", {}).get(str(line_idx), "")
+                        if text:
+                            texts.append(text)
+                    response["main_text_fr"] = "\n".join(texts) if texts else "(Texte français indisponible)"
+                else:
+                    response["main_text_fr"] = fr_data.get("judgement", "")
+            else:
+                response["ben_gua_fr"] = ben_gua_name
+                response["main_text_fr"] = "(Traduction française indisponible)"
+                
+            # Summary FR
+            if match:
+                hex1_fr = response.get("ben_gua_fr", match.group(2))
+                hex2_fr = match.group(3) # TODO: map zhi gua name to FR
+                
+                # Need to find hex2 index from Chinese Name
+                zhi_name_cn = match.group(3)
+                zhi_idx_cn = NAME_TO_INDEX.get(zhi_name_cn)
+                if zhi_idx_cn and str(zhi_idx_cn) in YI_JING_FR:
+                    hex2_fr = YI_JING_FR[str(zhi_idx_cn)]["name"]
+                
+                response["summary_fr"] = f"Traits mobiles: {count}. {hex1_fr} -> {hex2_fr}"
+            else:
+                summary_fr = response["summary"]
+                summary_fr = summary_fr.replace("吉", "Fauste (Bon)").replace("凶", "Néfaste (Mauvais)")
+                response["summary_fr"] = summary_fr
+                
         else:
             response["main_text_en"] = "(Classical text translation unavailable)"
+            response["main_text_fr"] = "(Traduction française indisponible)"
     
     return response
 
@@ -520,6 +615,30 @@ def get_current_time_divination():
         # Add EN
         response["gua_name_en"] = get_hex_en(result[0])
         # Need to parse moving_yao_info for EN?
+        
+        # Add FR
+        gua_name = result[0]
+        hex_idx = NAME_TO_INDEX.get(gua_name)
+        if hex_idx and str(hex_idx) in YI_JING_FR:
+            fr_data = YI_JING_FR[str(hex_idx)]
+            response["gua_name_fr"] = fr_data["name"]
+            
+            # Parse moving yao
+            yao_info = result[2] # e.g. "初九" or "六二"
+            line_idx = None
+            if "初" in yao_info: line_idx = 1
+            elif "二" in yao_info: line_idx = 2
+            elif "三" in yao_info: line_idx = 3
+            elif "四" in yao_info: line_idx = 4
+            elif "五" in yao_info: line_idx = 5
+            elif "上" in yao_info: line_idx = 6
+            
+            if line_idx:
+                response["main_text_fr"] = fr_data.get("lines", {}).get(str(line_idx), "")
+            else:
+                response["main_text_fr"] = fr_data.get("judgement", "")
+        else:
+            response["main_text_fr"] = "(Texte français indisponible)"
         
         return response
     except Exception as e:
