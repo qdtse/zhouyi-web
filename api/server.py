@@ -166,15 +166,16 @@ async def divine_match(req: MatchRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Static Files
-# Create public directory if not exists
-# Go up one level to find public directory since server.py is in api/
-static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "public")
-if not os.path.exists(static_dir):
-    os.makedirs(static_dir)
-
-app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
+# Static Files - REMOVED
+# We let Vercel handle static files serving directly from the public/ directory
+# This avoids "Read-only file system" errors in Serverless environment
 
 if __name__ == "__main__":
     import uvicorn
+    # For local development, we can mount static files conditionally
+    # But for Vercel deployment, we rely on vercel.json rewrites
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "public")
+    if os.path.exists(static_dir):
+        app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
+    
     uvicorn.run(app, host="0.0.0.0", port=8000)
