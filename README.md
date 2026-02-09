@@ -1,40 +1,39 @@
-# 周易卜卦 & 紫微斗数 API
+# Zhouyi Divination System (周易卜卦系统)
 
-这是一个基于 Python FastAPI 构建的周易卜卦与紫微斗数排盘系统。
+An ancient Chinese divination system built with Python (FastAPI) and modern Web technologies. It includes Meihua Yishu (Plum Blossom Divination), Zhuge Shenshu, Bazi (Four Pillars of Destiny), Ziwei Dou Shu, and more.
 
-## 功能特性
-- **周易卜卦**：测字、号码吉凶、起名分析。
-- **诸葛神数**：384签完整版测字。
-- **紫微斗数**：专业命盘生成（十二宫、主星、五行局等）。
-- **时间起卦**：梅花易数时间卦。
-- **随机起卦**：心诚则灵。
+## Features
 
-## 部署指南 (免费服务器)
+- **Text Divination**: Analyze names, companies, or phone numbers using Meihua Yishu.
+- **Zhuge Shenshu**: Traditional 384 lots divination.
+- **Number Divination**: Cast hexagrams using two numbers.
+- **Time Divination**: Cast hexagrams based on current date and time.
+- **Random Divination**: Virtual coin tossing (6 lines).
+- **Ziwei Dou Shu**: Generate natal charts (Star Chart).
+- **Bazi Analysis**: Four Pillars of Destiny analysis and Five Elements balance.
+- **Marriage Compatibility**: Check compatibility based on Bazi.
+- **Multi-language Support**: Chinese, English, and French.
 
-本项目已配置好适配主流免费托管平台的文件 (`Procfile`, `vercel.json`)。
+## Installation
 
-### 推荐平台 1: Vercel (推荐，速度快)
-1. 将本项目上传至您的 GitHub 仓库。
-2. 登录 [Vercel](https://vercel.com)。
-3. 点击 "Add New..." -> "Project"，导入您的 GitHub 仓库。
-4. Vercel 会自动识别 `vercel.json`，直接点击 "Deploy" 即可。
-5. 部署完成后，您将获得一个免费的 `https://your-project.vercel.app` 域名。
+1. Install dependencies:
+   ```bash
+   pip install fastapi uvicorn lunar_python pdfplumber
+   ```
 
-### 推荐平台 2: Render (适合作为 Web Service)
-1. 将本项目上传至您的 GitHub 仓库。
-2. 登录 [Render](https://render.com)。
-3. 点击 "New +" -> "Web Service"。
-4. 连接您的 GitHub 仓库。
-5. Runtime 选择 "Python 3"。
-6. Build Command: `pip install -r requirements.txt`
-7. Start Command: `uvicorn server:app --host 0.0.0.0 --port $PORT`
-8. 选择 "Free" 计划，点击 "Create Web Service"。
+2. Run the server:
+   ```bash
+   python server.py
+   ```
 
-## 本地运行
+3. Open browser at `http://localhost:8000`
 
-```bash
-pip install -r requirements.txt
-python server.py
-```
+## License & Copyright
 
-访问: `http://localhost:8000`
+**Copyright (C) 2026 Sugarworm**
+
+This program is free software: you can redistribute it and/or modify it under the terms of the **GNU General Public License as published by the Free Software Foundation**, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.

@@ -1,3 +1,11 @@
+# Copyright (C) 2026 Sugarworm
+# This file is part of Zhouyi Divination System.
+#
+# Zhouyi Divination System is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
 from lunar_python import Solar, Lunar
 from collections import Counter
 
