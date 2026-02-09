@@ -304,14 +304,10 @@ footer {
 }
 
 .paypal-link {
-    display: block;
-    width: 200px;
-    height: 200px;
+    display: inline-block;
 }
 
 .paypal-link img {
-    width: 100%;
-    height: 100%;
     cursor: pointer;
     transition: transform 0.2s;
 }
