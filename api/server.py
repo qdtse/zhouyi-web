@@ -113,6 +113,7 @@ class MatchRequest(BaseModel):
 # API Endpoints
 
 @app.get("/health")
+@app.get("/api/health")
 async def health_check():
     return {
         "status": "ok",
@@ -124,6 +125,7 @@ async def health_check():
     }
 
 @app.post("/divine/text")
+@app.post("/api/divine/text")
 async def divine_text(req: TextRequest):
     """
     Handles: Company Naming, Name Testing, Phone Number, License Plate, English Name
@@ -138,6 +140,7 @@ async def divine_text(req: TextRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/divine/zhuge")
+@app.post("/api/divine/zhuge")
 async def divine_zhuge(req: TextRequest):
     """
     Handles: Zhuge Shenshu Divination
@@ -151,6 +154,7 @@ async def divine_zhuge(req: TextRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/divine/pair")
+@app.post("/api/divine/pair")
 async def divine_pair(req: PairRequest):
     """
     Handles explicit number pairs
@@ -164,6 +168,7 @@ async def divine_pair(req: PairRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/divine/random")
+@app.get("/api/divine/random")
 async def divine_random():
     """
     Handles Random Divination
@@ -177,6 +182,7 @@ async def divine_random():
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/divine/current")
+@app.get("/api/divine/current")
 async def divine_current():
     """
     Handles Current Time Divination
@@ -190,6 +196,7 @@ async def divine_current():
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/divine/ziwei")
+@app.post("/api/divine/ziwei")
 async def divine_ziwei(req: ZiweiRequest):
     """
     Handles: Ziwei Doushu Chart
@@ -203,6 +210,7 @@ async def divine_ziwei(req: ZiweiRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/divine/bazi")
+@app.post("/api/divine/bazi")
 async def divine_bazi(req: BaziRequest):
     """
     Handles: Bazi Analysis (Eight Characters)
@@ -216,6 +224,7 @@ async def divine_bazi(req: BaziRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/divine/match")
+@app.post("/api/divine/match")
 async def divine_match(req: MatchRequest):
     """
     Handles: Bazi Marriage Compatibility
@@ -229,6 +238,12 @@ async def divine_match(req: MatchRequest):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# Mount static files for local development
+# In production (Vercel), this is handled by Vercel configuration
+public_path = os.path.join(os.path.dirname(current_dir), "public")
+if os.path.exists(public_path):
+    app.mount("/", StaticFiles(directory=public_path, html=True), name="static")
 
 if __name__ == "__main__":
     import uvicorn
