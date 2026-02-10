@@ -1,10 +1,12 @@
-from fastapi import FastAPI
-from mangum import Mangum
+import json
 
-app = FastAPI()
-
-@app.get("/api/test")
-async def test():
-    return {"status": "ok", "message": "Basic FastAPI works on Vercel"}
-
-handler = Mangum(app, lifespan="off")
+def handler(event, context):
+    return {
+        'statusCode': 200,
+        'headers': {
+            'Content-Type': 'application/json'
+        },
+        'body': json.dumps({
+            'message': 'Test endpoint works!'
+        })
+    }
