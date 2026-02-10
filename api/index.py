@@ -23,3 +23,6 @@ except ImportError:
         "Mangum is required for Vercel deployment. "
         "Please ensure 'mangum>=0.17.0' is in requirements.txt"
     )
+
+# Vercel requires the handler to be exported
+app_handler = handler
