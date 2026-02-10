@@ -1,19 +1,44 @@
 {
     "version": 2,
+    "outputDirectory": "public",
     "builds": [
         {
             "src": "api/index.py",
-            "use": "@vercel/python"
+            "use": "@vercel/python",
+            "config": {
+                "maxLambdaSize": "50mb"
+            }
         }
     ],
     "routes": [
+        {
+            "src": "/docs",
+            "dest": "api/index.py"
+        },
+        {
+            "src": "/openapi.json",
+            "dest": "api/index.py"
+        },
+        {
+            "src": "/health",
+            "dest": "api/index.py"
+        },
+        {
+            "src": "/divine/(.*)",
+            "dest": "api/index.py"
+        },
         {
             "src": "/api/(.*)",
             "dest": "api/index.py"
         },
         {
             "src": "/(.*)",
-            "dest": "api/index.py"
+            "dest": "/public/$1"
         }
-    ]
+    ],
+    "functions": {
+        "api/index.py": {
+            "maxDuration": 10
+        }
+    }
 }

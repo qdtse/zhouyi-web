@@ -45,7 +45,17 @@ except ImportError:
         import api.ziwei as ziwei
         import api.bazi as bazi
 
-app = FastAPI(title="Zhouyi Divination API")
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+app = FastAPI(
+    title="Zhouyi Divination API",
+    docs_url="/docs",
+    openapi_url="/openapi.json"
+)
 
 # CORS
 app.add_middleware(
@@ -56,11 +66,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static files
-import os
-static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "public")
-if os.path.exists(static_dir):
-    app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
+# Note: Static files are handled by Vercel's outputDirectory config
+# Do NOT mount static files here in serverless environment
+# This prevents conflicts with Vercel's routing
+
+# Global exception handler
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    logger.error(f"Global exception: {exc}", exc_info=True)
+    return {"detail": "Internal server error", "error": str(exc)}
 
 # Models
 class TextRequest(BaseModel):
