@@ -37,7 +37,7 @@
                 <div class="help-btn" data-module="text">?</div>
             </div>
             <p data-i18n="text_divination_desc">输入任何汉字、数字或英文，利用梅花易数原理进行起卦分析。</p>
-            <input type="text" id="textInput" placeholder="输入文字 (Input Text)" data-i18n-placeholder="text_placeholder">
+            <input type="text" id="textInput" placeholder="输入文字" data-i18n-placeholder="text_placeholder">
             <button onclick="divineText()" data-i18n="divine_btn">立即测算</button>
             <div id="textResult" class="result-area"></div>
         </div>
@@ -49,7 +49,7 @@
                 <div class="help-btn" data-module="zhuge">?</div>
             </div>
             <p data-i18n="zhuge_desc">报字测前程，输入三个汉字，通过笔画数理求取诸葛神签。</p>
-            <input type="text" id="zhugeInput" placeholder="输入三个字 (Input 3 Chars)" data-i18n-placeholder="zhuge_placeholder">
+            <input type="text" id="zhugeInput" placeholder="输入三个字" data-i18n-placeholder="zhuge_placeholder">
             <button onclick="divineZhuge()" data-i18n="divine_btn">立即测算</button>
             <div id="zhugeResult" class="result-area"></div>
         </div>
@@ -62,8 +62,8 @@
             </div>
             <p data-i18n="number_desc">输入两个数字（上卦与下卦），直接起卦预测。</p>
             <div class="input-group">
-                <input type="number" id="num1" placeholder="上卦 (Upper)" data-i18n-placeholder="upper_num_placeholder">
-                <input type="number" id="num2" placeholder="下卦 (Lower)" data-i18n-placeholder="lower_num_placeholder">
+                <input type="number" id="num1" placeholder="上卦数" data-i18n-placeholder="upper_num_placeholder">
+                <input type="number" id="num2" placeholder="下卦数" data-i18n-placeholder="lower_num_placeholder">
             </div>
             <button onclick="divinePair()" data-i18n="divine_btn">立即测算</button>
             <div id="pairResult" class="result-area"></div>
@@ -99,10 +99,10 @@
             </div>
             <p data-i18n="ziwei_desc">输入出生时间，排出紫微命盘 (仅供参考)。</p>
             <div class="input-group">
-                <input type="number" id="year" placeholder="年 (Year)" style="width: 25%" data-i18n-placeholder="year_placeholder">
-                <input type="number" id="month" placeholder="月 (Month)" style="width: 25%" data-i18n-placeholder="month_placeholder">
-                <input type="number" id="day" placeholder="日 (Day)" style="width: 25%" data-i18n-placeholder="day_placeholder">
-                <input type="number" id="hour" placeholder="时 (Hour)" style="width: 25%" data-i18n-placeholder="hour_placeholder">
+                <input type="number" id="year" placeholder="年" style="width: 25%" data-i18n-placeholder="year_placeholder">
+                <input type="number" id="month" placeholder="月" style="width: 25%" data-i18n-placeholder="month_placeholder">
+                <input type="number" id="day" placeholder="日" style="width: 25%" data-i18n-placeholder="day_placeholder">
+                <input type="number" id="hour" placeholder="时" style="width: 25%" data-i18n-placeholder="hour_placeholder">
             </div>
             <button onclick="divineZiwei()" data-i18n="divine_btn">立即测算</button>
             <div id="ziweiResult" class="result-area"></div>
@@ -116,10 +116,10 @@
             </div>
             <p data-i18n="bazi_desc">输入出生时间，分析八字命盘、五行喜忌及日主强弱。</p>
             <div class="input-group">
-                <input type="number" id="bazi_year" placeholder="年 (Year)" style="width: 25%" data-i18n-placeholder="year_placeholder">
-                <input type="number" id="bazi_month" placeholder="月 (Month)" style="width: 25%" data-i18n-placeholder="month_placeholder">
-                <input type="number" id="bazi_day" placeholder="日 (Day)" style="width: 25%" data-i18n-placeholder="day_placeholder">
-                <input type="number" id="bazi_hour" placeholder="时 (Hour)" style="width: 25%" data-i18n-placeholder="hour_placeholder">
+                <input type="number" id="bazi_year" placeholder="年" style="width: 25%" data-i18n-placeholder="year_placeholder">
+                <input type="number" id="bazi_month" placeholder="月" style="width: 25%" data-i18n-placeholder="month_placeholder">
+                <input type="number" id="bazi_day" placeholder="日" style="width: 25%" data-i18n-placeholder="day_placeholder">
+                <input type="number" id="bazi_hour" placeholder="时" style="width: 25%" data-i18n-placeholder="hour_placeholder">
             </div>
             <button onclick="divineBazi()" data-i18n="divine_btn">立即测算</button>
             <div id="baziResult" class="result-area"></div>
@@ -132,14 +132,14 @@
                 <div class="help-btn" data-module="match">?</div>
             </div>
             <p data-i18n="match_desc">输入双方出生时间，测算婚姻匹配度、生肖合冲及五行互补。</p>
-            <div class="subtitle-small" data-i18n="male_info">男方信息 (Male)</div>
+            <div class="subtitle-small" data-i18n="male_info">男方信息</div>
             <div class="input-group">
                 <input type="number" id="m_year" placeholder="年" style="width: 25%" data-i18n-placeholder="year_placeholder">
                 <input type="number" id="m_month" placeholder="月" style="width: 25%" data-i18n-placeholder="month_placeholder">
                 <input type="number" id="m_day" placeholder="日" style="width: 25%" data-i18n-placeholder="day_placeholder">
                 <input type="number" id="m_hour" placeholder="时" style="width: 25%" data-i18n-placeholder="hour_placeholder">
             </div>
-            <div class="subtitle-small" data-i18n="female_info">女方信息 (Female)</div>
+            <div class="subtitle-small" data-i18n="female_info">女方信息</div>
             <div class="input-group">
                 <input type="number" id="f_year" placeholder="年" style="width: 25%" data-i18n-placeholder="year_placeholder">
                 <input type="number" id="f_month" placeholder="月" style="width: 25%" data-i18n-placeholder="month_placeholder">
@@ -322,8 +322,8 @@
                 bazi_desc: "输入出生时间，分析八字命盘、五行喜忌及日主强弱。",
                 match_title: "八字合婚 (姻缘匹配)",
                 match_desc: "输入双方出生时间，测算婚姻匹配度、生肖合冲及五行互补。",
-                male_info: "男方信息 (Male)",
-                female_info: "女方信息 (Female)",
+                male_info: "男方信息",
+                female_info: "女方信息",
                 result_label: "【测算结果】",
                 error_label: "错误: ",
                 input_error: "请输入内容",
@@ -732,6 +732,8 @@
                 showResult('matchResult', translations[currentLang].error_label + e.message);
             }
         }
+        
+        setLang(currentLang);
     </script>
 </body>
 </html>
