@@ -14,37 +14,36 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import sys
 import os
+import sys
 
-# Add current directory to path for imports
+# Ensure current directory is in path for local imports
 current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.insert(0, current_dir)
 
 from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
 
-# Import local modules with error handling
+# Conditional imports for utils/ziwei/bazi
 try:
     import utils
-except Exception as e:
-    print(f"Error importing utils: {e}", file=sys.stderr)
-    utils = None
-
-try:
     import ziwei
-except Exception as e:
-    print(f"Error importing ziwei: {e}", file=sys.stderr)
-    ziwei = None
-
-try:
     import bazi
-except Exception as e:
-    print(f"Error importing bazi: {e}", file=sys.stderr)
-    bazi = None
+except ImportError:
+    try:
+        from . import utils
+        from . import ziwei
+        from . import bazi
+    except ImportError as e:
+        # Last resort: try adding parent dir
+        sys.path.append(os.path.dirname(current_dir))
+        import api.utils as utils
+        import api.ziwei as ziwei
+        import api.bazi as bazi
 
 app = FastAPI(title="Zhouyi Divination API")
 
