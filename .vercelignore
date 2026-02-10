@@ -1,23 +1,40 @@
-__pycache__
+# Python cache
+__pycache__/
 *.pyc
 *.pyo
 *.pyd
-.Python
-*.so
-*.egg
-*.egg-info
-dist
-build
-.git
-.gitignore
-local_archive
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local data
+local_archive/
+.env
+
+# Logs
+*.log
+
+# Test scripts (not needed in production)
 check_*.py
-find_*.py
 extract_*.py
+find_*.py
 inspect_*.py
-reproduce_issue.py
 test_*.py
-*.pdf
-*.txt
-LICENSE
+reproduce_issue.py
+
+# Documentation (optional for deployment)
+DEPLOYMENT.md
+TROUBLESHOOTING.md
 README.md
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# Other
+Procfile
+requirements-minimal.txt
+vercel-test.json
