@@ -13,16 +13,12 @@ except ImportError:
     from .server import app
 
 # Wrap with Mangum for Vercel serverless compatibility
-try:
-    from mangum import Mangum
-    handler = Mangum(app, api_gateway_base_path="/api")
-except ImportError:
-    # Fallback if mangum is not installed
-    # Vercel should handle this but raise clear error
-    raise ImportError(
-        "Mangum is required for Vercel deployment. "
-        "Please ensure 'mangum>=0.17.0' is in requirements.txt"
-    )
+from mangum import Mangum
 
-# Vercel requires the handler to be exported
-app_handler = handler
+# Create handler class for Vercel
+class Handler(Mangum):
+    def __init__(self):
+        super().__init__(app, api_gateway_base_path="/api")
+
+# Vercel expects a class named 'handler'
+handler = Handler
