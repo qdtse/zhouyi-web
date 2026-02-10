@@ -92,7 +92,7 @@ class MatchRequest(BaseModel):
 
 # API Endpoints
 
-@app.get("/api/health")
+@app.get("/health")
 async def health_check():
     return {
         "status": "ok",
@@ -103,7 +103,7 @@ async def health_check():
         }
     }
 
-@app.post("/api/divine/text")
+@app.post("/divine/text")
 async def divine_text(req: TextRequest):
     """
     Handles: Company Naming, Name Testing, Phone Number, License Plate, English Name
@@ -117,7 +117,7 @@ async def divine_text(req: TextRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/divine/zhuge")
+@app.post("/divine/zhuge")
 async def divine_zhuge(req: TextRequest):
     """
     Handles: Zhuge Shenshu Divination
@@ -130,7 +130,7 @@ async def divine_zhuge(req: TextRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/divine/pair")
+@app.post("/divine/pair")
 async def divine_pair(req: PairRequest):
     """
     Handles explicit number pairs
@@ -143,7 +143,7 @@ async def divine_pair(req: PairRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/divine/random")
+@app.get("/divine/random")
 async def divine_random():
     """
     Handles Random Divination
@@ -156,7 +156,7 @@ async def divine_random():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/divine/current")
+@app.get("/divine/current")
 async def divine_current():
     """
     Handles Current Time Divination
@@ -169,7 +169,7 @@ async def divine_current():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/divine/ziwei")
+@app.post("/divine/ziwei")
 async def divine_ziwei(req: ZiweiRequest):
     """
     Handles: Ziwei Doushu Chart
@@ -182,7 +182,7 @@ async def divine_ziwei(req: ZiweiRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/divine/bazi")
+@app.post("/divine/bazi")
 async def divine_bazi(req: BaziRequest):
     """
     Handles: Bazi Analysis (Eight Characters)
@@ -195,7 +195,7 @@ async def divine_bazi(req: BaziRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/divine/match")
+@app.post("/divine/match")
 async def divine_match(req: MatchRequest):
     """
     Handles: Bazi Marriage Compatibility
