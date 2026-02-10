@@ -3,6 +3,9 @@ fastapi==0.104.1
 pydantic==2.5.0
 mangum==0.17.0
 
+# Scientific computing (required by ichingshifa)
+numpy
+
 # Divination libraries
 ichingshifa
 sxtwl
