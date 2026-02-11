@@ -1,32 +1,26 @@
 import os
 import sys
-import traceback
 
 # Vercel entry point
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-# Import the FastAPI app with error handling
+# Import the FastAPI app
 try:
     from server import app
-except ImportError as e:
-    error_msg = f"Failed to import app: {str(e)}\n{traceback.format_exc()}"
-    # Create a minimal app that returns the error
-    from fastapi import FastAPI
-    app = FastAPI()
-    
-    @app.get("/")
-    @app.get("/{path:path}")
-    async def error_handler(path: str = ""):
-        return {"error": error_msg}
+except ImportError:
+    from .server import app
 
 # Wrap with Mangum for Vercel serverless compatibility
-try:
-    from mangum import Mangum
-    handler = Mangum(app, lifespan="off")
-except ImportError as e:
-    # Fallback if mangum is not available
-    def handler(event, context):
-        return {
-            "statusCode": 500,
-            "body": f"Mangum import error: {str(e)}"
-        }
+from mangum import Mangum
+
+# Vercel expects handler to be a class that can be instantiated
+# Mangum returns a callable that wraps the ASGI app
+class Handler:
+    def __init__(self):
+        self.mangum = Mangum(app, lifespan="off")
+    
+    def __call__(self, event, context):
+        return self.mangum(event, context)
+
+# Export handler class for Vercel
+handler = Handler

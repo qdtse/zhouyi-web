@@ -66,14 +66,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static files for Vercel serverless
-# Calculate path to public directory (sibling of api directory)
-public_dir = os.path.join(os.path.dirname(current_dir), "public")
-if os.path.exists(public_dir):
-    app.mount("/", StaticFiles(directory=public_dir, html=True), name="static")
-    logger.info(f"Mounted static files from {public_dir}")
-else:
-    logger.warning(f"Public directory not found at {public_dir}")
+# Note: Static files are handled by Vercel's outputDirectory config
+# Do NOT mount static files here in serverless environment
+# This prevents conflicts with Vercel's routing
 
 # Global exception handler
 @app.exception_handler(Exception)
