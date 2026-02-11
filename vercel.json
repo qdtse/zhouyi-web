@@ -1,28 +1,14 @@
 {
     "version": 2,
-    "outputDirectory": "public",
+    "builds": [
+        {
+            "src": "api/index.py",
+            "use": "@vercel/python"
+        }
+    ],
     "routes": [
         {
-            "handle": "filesystem"
-        },
-        {
-            "src": "/docs",
-            "dest": "api/index.py"
-        },
-        {
-            "src": "/openapi.json",
-            "dest": "api/index.py"
-        },
-        {
-            "src": "/health",
-            "dest": "api/index.py"
-        },
-        {
-            "src": "/divine/(.*)",
-            "dest": "api/index.py"
-        },
-        {
-            "src": "/api/(.*)",
+            "src": "/(.*)",
             "dest": "api/index.py"
         }
     ]
