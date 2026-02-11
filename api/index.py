@@ -13,14 +13,5 @@ except ImportError:
 # Wrap with Mangum for Vercel serverless compatibility
 from mangum import Mangum
 
-# Vercel expects handler to be a class that can be instantiated
-# Mangum returns a callable that wraps the ASGI app
-class Handler:
-    def __init__(self):
-        self.mangum = Mangum(app, lifespan="off")
-    
-    def __call__(self, event, context):
-        return self.mangum(event, context)
-
-# Export handler class for Vercel
-handler = Handler
+# Create handler instance - Vercel expects a callable
+handler = Mangum(app, lifespan="off")
