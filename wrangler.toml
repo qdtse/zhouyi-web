@@ -1,0 +1,8 @@
+name = "zhouyi-web"
+main = "src/worker.py"
+compatibility_date = "2025-02-18"
+compatibility_flags = ["python_workers"]
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
