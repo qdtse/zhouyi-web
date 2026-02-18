@@ -4,6 +4,8 @@ version = "0.1.0"
 description = "Zhouyi Divination System - I Ching divination web application"
 requires-python = ">=3.12"
 dependencies = [
+    "workers-py",
+    "workers-runtime-sdk",
     "fastapi",
     "pydantic",
     "numpy",
@@ -11,10 +13,4 @@ dependencies = [
     "lunar-python",
     "strokes",
     "cn2an",
-]
-
-[dependency-groups]
-dev = [
-    "workers-py",
-    "workers-runtime-sdk",
 ]

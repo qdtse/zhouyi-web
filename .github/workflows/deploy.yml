@@ -17,8 +17,11 @@ jobs:
         with:
           version: "latest"
 
-      - name: Install pywrangler
-        run: uv tool install workers-py
+      - name: Setup Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync
 
       - name: Deploy to Cloudflare Workers
         run: uv run pywrangler deploy
