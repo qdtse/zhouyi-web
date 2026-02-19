@@ -10,7 +10,6 @@ dependencies = [
     "pydantic",
     "numpy",
     "ichingshifa",
-    "lunar-python",
     "strokes",
     "cn2an",
 ]
