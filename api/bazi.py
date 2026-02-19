@@ -6,7 +6,10 @@
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 
-from lunar_python import Solar, Lunar
+try:
+    from lunar_python import Solar, Lunar
+except ImportError:
+    from simple_lunar import Solar, Lunar
 from collections import Counter
 
 # 五行生克关系

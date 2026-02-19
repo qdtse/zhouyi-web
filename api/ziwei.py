@@ -1,4 +1,7 @@
-from lunar_python import Lunar, Solar
+try:
+    from lunar_python import Lunar, Solar
+except ImportError:
+    from simple_lunar import Lunar, Solar
 
 class ZiweiChart:
     def __init__(self, year, month, day, hour):

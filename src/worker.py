@@ -3,9 +3,7 @@ import json
 import sys
 import os
 
-src_dir = os.path.dirname(os.path.abspath(__file__))
-api_dir = os.path.join(os.path.dirname(src_dir), "api")
-sys.path.insert(0, src_dir)
+api_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "api")
 sys.path.insert(0, api_dir)
 
 from fastapi import FastAPI, HTTPException
