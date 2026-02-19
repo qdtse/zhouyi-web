@@ -1,0 +1,15 @@
+{
+  "name": "zhouyi-web",
+  "version": "1.0.0",
+  "description": "Zhouyi Divination System - I Ching divination web application",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

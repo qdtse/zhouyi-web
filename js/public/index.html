@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>周易占卜系统</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; color: #fff; }
+    .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+    h1 { text-align: center; margin: 20px 0; font-size: 2em; }
+    .card { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin: 15px 0; }
+    .card h2 { margin-bottom: 15px; color: #ffd700; }
+    input, textarea { width: 100%; padding: 12px; border: none; border-radius: 8px; margin: 8px 0; font-size: 16px; }
+    button { background: linear-gradient(135deg, #ffd700, #ff8c00); color: #1a1a2e; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; margin-top: 10px; }
+    button:hover { transform: scale(1.02); }
+    .result { background: rgba(0,0,0,0.3); border-radius: 8px; padding: 15px; margin-top: 15px; white-space: pre-wrap; }
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tab { padding: 10px 20px; background: rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; }
+    .tab.active { background: #ffd700; color: #1a1a2e; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔮 周易占卜系统</h1>
+    
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('text')">文字起卦</div>
+      <div class="tab" onclick="showTab('random')">随机占卜</div>
+      <div class="tab" onclick="showTab('bazi')">八字分析</div>
+    </div>
+    
+    <div id="text-tab" class="tab-content">
+      <div class="card">
+        <h2>梅花易数 - 文字起卦</h2>
+        <textarea id="text-input" placeholder="请输入文字（如：今日运势如何？）" rows="3"></textarea>
+        <select id="focus-select" style="width:100%;padding:12px;border-radius:8px;margin:8px 0;">
+          <option value="general">综合运势</option>
+          <option value="love">姻缘感情</option>
+          <option value="wealth">财运事业</option>
+          <option value="career">事业发展</option>
+        </select>
+        <button onclick="divineText()">开始占卜</button>
+        <div id="text-result" class="result"></div>
+      </div>
+    </div>
+    
+    <div id="random-tab" class="tab-content" style="display:none;">
+      <div class="card">
+        <h2>随机占卜</h2>
+        <button onclick="divineRandom()">随机起卦</button>
+        <div id="random-result" class="result"></div>
+      </div>
+    </div>
+    
+    <div id="bazi-tab" class="tab-content" style="display:none;">
+      <div class="card">
+        <h2>八字分析</h2>
+        <input type="number" id="year-input" placeholder="出生年份" value="1990">
+        <input type="number" id="month-input" placeholder="出生月份" value="1">
+        <input type="number" id="day-input" placeholder="出生日期" value="1">
+        <input type="number" id="hour-input" placeholder="出生时辰（0-23）" value="12">
+        <button onclick="analyzeBazi()">分析八字</button>
+        <div id="bazi-result" class="result"></div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    const API_BASE = '';
+    
+    function showTab(name) {
+      document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+      document.getElementById(name + '-tab').style.display = 'block';
+      event.target.classList.add('active');
+    }
+    
+    async function divineText() {
+      const text = document.getElementById('text-input').value;
+      const focus = document.getElementById('focus-select').value;
+      const resultDiv = document.getElementById('text-result');
+      resultDiv.textContent = '占卜中...';
+      
+      try {
+        const res = await fetch(API_BASE + '/api/divine/text', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, focus })
+        });
+        const data = await res.json();
+        resultDiv.textContent = JSON.stringify(data, null, 2);
+      } catch (e) {
+        resultDiv.textContent = '占卜失败：' + e.message;
+      }
+    }
+    
+    async function divineRandom() {
+      const resultDiv = document.getElementById('random-result');
+      resultDiv.textContent = '占卜中...';
+      
+      try {
+        const res = await fetch(API_BASE + '/api/divine/random');
+        const data = await res.json();
+        resultDiv.textContent = JSON.stringify(data, null, 2);
+      } catch (e) {
+        resultDiv.textContent = '占卜失败：' + e.message;
+      }
+    }
+    
+    async function analyzeBazi() {
+      const year = parseInt(document.getElementById('year-input').value);
+      const month = parseInt(document.getElementById('month-input').value);
+      const day = parseInt(document.getElementById('day-input').value);
+      const hour = parseInt(document.getElementById('hour-input').value);
+      const resultDiv = document.getElementById('bazi-result');
+      resultDiv.textContent = '分析中...';
+      
+      try {
+        const res = await fetch(API_BASE + '/api/divine/bazi', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ year, month, day, hour })
+        });
+        const data = await res.json();
+        resultDiv.textContent = JSON.stringify(data, null, 2);
+      } catch (e) {
+        resultDiv.textContent = '分析失败：' + e.message;
+      }
+    }
+  </script>
+</body>
+</html>
