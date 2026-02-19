@@ -26,7 +26,7 @@ async function handleRequest(request) {
   }
 
   if (path === '/health' || path === '/api/health') {
-    return jsonResponse({ status: 'ok' });
+    return jsonResponse({ status: 'ok', timestamp: new Date().toISOString() });
   }
 
   if (method === 'POST') {
