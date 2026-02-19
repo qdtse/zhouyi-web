@@ -6,8 +6,6 @@ requires-python = ">=3.12"
 dependencies = [
     "workers-py",
     "workers-runtime-sdk",
-    "fastapi",
-    "pydantic",
     "numpy",
     "ichingshifa",
     "strokes",
