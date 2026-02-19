@@ -13,9 +13,22 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
 
-import utils
-import ziwei
-import bazi
+# 延迟加载模块，避免启动时 CPU 超限
+utils = None
+ziwei = None
+bazi = None
+
+def load_modules():
+    global utils, ziwei, bazi
+    if utils is None:
+        import utils as _utils
+        utils = _utils
+    if ziwei is None:
+        import ziwei as _ziwei
+        ziwei = _ziwei
+    if bazi is None:
+        import bazi as _bazi
+        bazi = _bazi
 
 app = FastAPI(
     title="Zhouyi Divination API",
@@ -66,19 +79,14 @@ class MatchRequest(BaseModel):
 async def health_check():
     return {
         "status": "ok",
-        "modules": {
-            "utils": utils is not None,
-            "ziwei": ziwei is not None,
-            "bazi": bazi is not None
-        }
+        "modules_loaded": utils is not None
     }
 
 @app.post("/divine/text")
 @app.post("/api/divine/text")
 async def divine_text(req: TextRequest):
-    if utils is None:
-        raise HTTPException(status_code=503, detail="Utils module not available")
     try:
+        load_modules()
         result = utils.calculate_hexagram_from_text(req.text, req.focus)
         return result
     except Exception as e:
@@ -87,9 +95,8 @@ async def divine_text(req: TextRequest):
 @app.post("/divine/zhuge")
 @app.post("/api/divine/zhuge")
 async def divine_zhuge(req: TextRequest):
-    if utils is None:
-        raise HTTPException(status_code=503, detail="Utils module not available")
     try:
+        load_modules()
         result = utils.calculate_zhuge_from_text(req.text)
         return result
     except Exception as e:
@@ -98,9 +105,8 @@ async def divine_zhuge(req: TextRequest):
 @app.post("/divine/pair")
 @app.post("/api/divine/pair")
 async def divine_pair(req: PairRequest):
-    if utils is None:
-        raise HTTPException(status_code=503, detail="Utils module not available")
     try:
+        load_modules()
         result = utils.calculate_hexagram_from_numbers(req.num1, req.num2)
         return result
     except Exception as e:
@@ -109,9 +115,8 @@ async def divine_pair(req: PairRequest):
 @app.get("/divine/random")
 @app.get("/api/divine/random")
 async def divine_random():
-    if utils is None:
-        raise HTTPException(status_code=503, detail="Utils module not available")
     try:
+        load_modules()
         result = utils.get_random_divination()
         return result
     except Exception as e:
@@ -120,9 +125,8 @@ async def divine_random():
 @app.get("/divine/current")
 @app.get("/api/divine/current")
 async def divine_current():
-    if utils is None:
-        raise HTTPException(status_code=503, detail="Utils module not available")
     try:
+        load_modules()
         result = utils.get_current_time_divination()
         return result
     except Exception as e:
@@ -131,9 +135,8 @@ async def divine_current():
 @app.post("/divine/ziwei")
 @app.post("/api/divine/ziwei")
 async def divine_ziwei(req: ZiweiRequest):
-    if ziwei is None:
-        raise HTTPException(status_code=503, detail="Ziwei module not available")
     try:
+        load_modules()
         chart = ziwei.ZiweiChart(req.year, req.month, req.day, req.hour)
         return chart.json()
     except Exception as e:
@@ -142,9 +145,8 @@ async def divine_ziwei(req: ZiweiRequest):
 @app.post("/divine/bazi")
 @app.post("/api/divine/bazi")
 async def divine_bazi(req: BaziRequest):
-    if bazi is None:
-        raise HTTPException(status_code=503, detail="Bazi module not available")
     try:
+        load_modules()
         result = bazi.get_bazi_analysis(req.year, req.month, req.day, req.hour)
         return result
     except Exception as e:
@@ -153,9 +155,8 @@ async def divine_bazi(req: BaziRequest):
 @app.post("/divine/match")
 @app.post("/api/divine/match")
 async def divine_match(req: MatchRequest):
-    if bazi is None:
-        raise HTTPException(status_code=503, detail="Bazi module not available")
     try:
+        load_modules()
         male = bazi.get_bazi_analysis(req.male_year, req.male_month, req.male_day, req.male_hour)
         female = bazi.get_bazi_analysis(req.female_year, req.female_month, req.female_day, req.female_hour)
         result = bazi.check_marriage_compatibility(male, female)
