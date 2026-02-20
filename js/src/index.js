@@ -83,65 +83,78 @@ async function handleRequest(request) {
     return jsonResponse({ status: 'ok', timestamp: new Date().toISOString(), version: '1.0.0' });
   }
 
-  if (method === 'POST') {
-    let body;
-    try {
-      body = await request.json();
-    } catch {
-      return jsonResponse({ error: 'Invalid JSON' }, 400);
+  async function getParams() {
+    if (method === 'POST') {
+      try {
+        return await request.json();
+      } catch {
+        return {};
+      }
+    } else {
+      const params = {};
+      url.searchParams.forEach((value, key) => {
+        params[key] = isNaN(value) ? value : parseInt(value);
+      });
+      return params;
     }
+  }
 
-    if (path === '/divine/text' || path === '/api/divine/text') {
-      const result = calculateHexagramFromText(body.text || '', body.focus || 'general');
-      return jsonResponse(result);
-    }
+  if (path === '/divine/text' || path === '/api/divine/text') {
+    const body = await getParams();
+    const result = calculateHexagramFromText(body.text || '占卜', body.focus || 'general');
+    return jsonResponse(result);
+  }
 
-    if (path === '/divine/zhuge' || path === '/api/divine/zhuge') {
-      const result = getZhugeFromText(body.text || '');
-      return jsonResponse(result);
-    }
+  if (path === '/divine/zhuge' || path === '/api/divine/zhuge') {
+    const body = await getParams();
+    const result = getZhugeFromText(body.text || '诸葛神数');
+    return jsonResponse(result);
+  }
 
-    if (path === '/divine/pair' || path === '/api/divine/pair') {
-      const result = calculateHexagramFromNumbers(body.num1 || 0, body.num2 || 0);
-      return jsonResponse(result);
-    }
+  if (path === '/divine/pair' || path === '/api/divine/pair') {
+    const body = await getParams();
+    const result = calculateHexagramFromNumbers(body.num1 || 1, body.num2 || 2);
+    return jsonResponse(result);
+  }
 
-    if (path === '/divine/ziwei' || path === '/api/divine/ziwei') {
-      const chart = new ZiweiChart(
-        body.year || 1990,
-        body.month || 1,
-        body.day || 1,
-        body.hour || 12
-      );
-      return jsonResponse(chart.toJSON());
-    }
+  if (path === '/divine/ziwei' || path === '/api/divine/ziwei') {
+    const body = await getParams();
+    const chart = new ZiweiChart(
+      body.year || 1990,
+      body.month || 1,
+      body.day || 1,
+      body.hour || 12
+    );
+    return jsonResponse(chart.toJSON());
+  }
 
-    if (path === '/divine/bazi' || path === '/api/divine/bazi') {
-      const result = getBaziAnalysis(
-        body.year || 1990,
-        body.month || 1,
-        body.day || 1,
-        body.hour || 12
-      );
-      return jsonResponse(result);
-    }
+  if (path === '/divine/bazi' || path === '/api/divine/bazi') {
+    const body = await getParams();
+    const result = getBaziAnalysis(
+      body.year || 1990,
+      body.month || 1,
+      body.day || 1,
+      body.hour || 12
+    );
+    return jsonResponse(result);
+  }
 
-    if (path === '/divine/match' || path === '/api/divine/match') {
-      const male = getBaziAnalysis(
-        body.male_year || 1990,
-        body.male_month || 1,
-        body.male_day || 1,
-        body.male_hour || 12
-      );
-      const female = getBaziAnalysis(
-        body.female_year || 1990,
-        body.female_month || 1,
-        body.female_day || 1,
-        body.female_hour || 12
-      );
-      const result = checkMarriageCompatibility(male, female);
-      return jsonResponse(result);
-    }
+  if (path === '/divine/match' || path === '/api/divine/match') {
+    const body = await getParams();
+    const male = getBaziAnalysis(
+      body.male_year || 1990,
+      body.male_month || 1,
+      body.male_day || 1,
+      body.male_hour || 12
+    );
+    const female = getBaziAnalysis(
+      body.female_year || 1990,
+      body.female_month || 1,
+      body.female_day || 1,
+      body.female_hour || 12
+    );
+    const result = checkMarriageCompatibility(male, female);
+    return jsonResponse(result);
   }
 
   if (path === '/divine/random' || path === '/api/divine/random') {
@@ -154,7 +167,7 @@ async function handleRequest(request) {
     return jsonResponse(result);
   }
 
-  return jsonResponse({ error: 'Not found' }, 404);
+  return jsonResponse({ error: 'Not found', hint: 'Use GET with query params or POST with JSON body' }, 404);
 }
 
 export default {
