@@ -25,6 +25,60 @@ async function handleRequest(request) {
     return new Response(null, { status: 204, headers: CORS_HEADERS });
   }
 
+  if (path === '/' || path === '') {
+    return new Response(`<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>周易占卜系统</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; color: #fff; }
+    .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+    h1 { text-align: center; padding: 30px 0; font-size: 2.5em; background: linear-gradient(90deg, #f39c12, #e74c3c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .api-list { background: rgba(255,255,255,0.1); border-radius: 15px; padding: 20px; margin: 20px 0; }
+    .api-item { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .api-item:last-child { border-bottom: none; }
+    .api-path { color: #f39c12; font-family: monospace; font-size: 1.1em; }
+    .api-desc { color: #aaa; margin-top: 5px; }
+    .status { text-align: center; padding: 20px; color: #2ecc71; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>☯ 周易占卜系统</h1>
+    <div class="status">✅ 系统运行正常</div>
+    <div class="api-list">
+      <h3 style="margin-bottom:15px;color:#f39c12;">API 端点</h3>
+      <div class="api-item">
+        <div class="api-path">GET /health</div>
+        <div class="api-desc">健康检查</div>
+      </div>
+      <div class="api-item">
+        <div class="api-path">POST /divine/text</div>
+        <div class="api-desc">文字起卦 - 参数: text, focus</div>
+      </div>
+      <div class="api-item">
+        <div class="api-path">POST /divine/bazi</div>
+        <div class="api-desc">八字分析 - 参数: year, month, day, hour</div>
+      </div>
+      <div class="api-item">
+        <div class="api-path">POST /divine/ziwei</div>
+        <div class="api-desc">紫微斗数 - 参数: year, month, day, hour</div>
+      </div>
+      <div class="api-item">
+        <div class="api-path">GET /divine/random</div>
+        <div class="api-desc">随机占卜</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`, {
+      headers: { 'Content-Type': 'text/html; charset=utf-8' }
+    });
+  }
+
   if (path === '/health' || path === '/api/health') {
     return jsonResponse({ status: 'ok', timestamp: new Date().toISOString(), version: '1.0.0' });
   }
