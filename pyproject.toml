@@ -2,10 +2,9 @@
 name = "zhouyi-web"
 version = "0.1.0"
 description = "Zhouyi Divination System - I Ching divination web application"
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 dependencies = [
     "workers-py",
-    "workers-runtime-sdk",
     "numpy",
     "ichingshifa",
     "strokes",
