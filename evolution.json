@@ -1,0 +1,90 @@
+{
+  "skill_name": "zhouyi-web",
+  "description": "周易占卜系统 - I Ching divination web application deployed on Cloudflare Workers",
+  "last_updated": "2026-02-20",
+  "successful_solutions": [
+    {
+      "problem": "Cloudflare Python Workers 启动超时",
+      "solution": "Python Workers 使用 Pyodide，启动时间约 2 秒，超过 Cloudflare 1000ms CPU 限制。解决方案：使用 JavaScript 重写 Worker，启动时间约 50ms",
+      "date": "2026-02-20"
+    },
+    {
+      "problem": "GitHub HTTPS 连接被阻止",
+      "solution": "使用 SSH over 443 端口绕过网络限制：git remote set-url origin git@ssh.github.com:user/repo.git，然后设置 GIT_SSH_COMMAND='ssh -p 443'",
+      "date": "2026-02-20"
+    },
+    {
+      "problem": "Cloudflare API Token 权限不足",
+      "solution": "API Token 需要以下权限：Workers Scripts Edit, Account Settings Read, User Details Read, User Memberships Read。最简单的解决方案是使用 Global API Key",
+      "date": "2026-02-20"
+    },
+    {
+      "problem": "Worker API 只支持 POST 请求",
+      "solution": "修改路由逻辑，同时支持 GET（使用 URL 参数）和 POST（使用 JSON body）请求，方便浏览器直接测试",
+      "date": "2026-02-20"
+    },
+    {
+      "problem": "浏览器访问 API 显示纯 JSON",
+      "solution": "通过检查 Accept header 判断请求来源，浏览器请求返回 HTML 格式，API 调用返回 JSON 格式",
+      "date": "2026-02-20"
+    }
+  ],
+  "failed_attempts": [
+    {
+      "problem": "尝试优化 Python Worker 启动时间",
+      "reason": "Pyodide 本身需要约 2 秒初始化，无法通过代码优化解决",
+      "lesson": "Cloudflare Python Workers 不适合需要快速启动的应用",
+      "date": "2026-02-20"
+    },
+    {
+      "problem": "使用 lunar-python 库",
+      "reason": "该库只有 .tar.gz 源码包，Pyodide 需要 wheel 包",
+      "lesson": "Cloudflare Python Workers 只支持 wheel 格式的依赖包",
+      "date": "2026-02-20"
+    }
+  ],
+  "code_patterns": [
+    {
+      "pattern": "JavaScript Worker 路由处理",
+      "code": "export default { async fetch(request, env, ctx) { return handleRequest(request); } };",
+      "description": "使用 ES modules 格式导出 Worker"
+    },
+    {
+      "pattern": "CORS 处理",
+      "code": "const CORS_HEADERS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' };",
+      "description": "所有响应都应包含 CORS headers"
+    },
+    {
+      "pattern": "浏览器/API 双格式响应",
+      "code": "const accept = request?.headers?.get('Accept') || ''; const isBrowser = accept.includes('text/html');",
+      "description": "通过 Accept header 判断返回 HTML 还是 JSON"
+    }
+  ],
+  "deployment_config": {
+    "platform": "Cloudflare Workers",
+    "github_actions": {
+      "workflow_file": ".github/workflows/deploy.yml",
+      "secrets": ["CLOUDFLARE_API_TOKEN"],
+      "env_vars": ["CLOUDFLARE_ACCOUNT_ID"]
+    },
+    "wrangler_config": {
+      "main": "src/index.js",
+      "compatibility_date": "2024-01-01"
+    }
+  },
+  "api_endpoints": [
+    { "path": "/", "method": "GET", "description": "首页" },
+    { "path": "/health", "method": "GET", "description": "健康检查" },
+    { "path": "/divine/text", "method": "GET/POST", "params": ["text", "focus"], "description": "文字起卦" },
+    { "path": "/divine/bazi", "method": "GET/POST", "params": ["year", "month", "day", "hour"], "description": "八字分析" },
+    { "path": "/divine/ziwei", "method": "GET/POST", "params": ["year", "month", "day", "hour"], "description": "紫微斗数" },
+    { "path": "/divine/random", "method": "GET", "description": "随机占卜" },
+    { "path": "/divine/zhuge", "method": "GET/POST", "params": ["text"], "description": "诸葛神数" }
+  ],
+  "preferences": [
+    "优先使用 JavaScript 实现 Worker，避免 Python 的启动时间问题",
+    "API 应同时支持 GET 和 POST 请求以便测试",
+    "浏览器访问应返回美化的 HTML 页面",
+    "使用 GitHub Actions 自动部署"
+  ]
+}
