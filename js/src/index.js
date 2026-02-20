@@ -9,11 +9,128 @@ const CORS_HEADERS = {
   'Content-Type': 'application/json'
 };
 
-function jsonResponse(data, status = 200) {
+function jsonResponse(data, status = 200, request) {
+  const accept = request?.headers?.get('Accept') || '';
+  const isBrowser = accept.includes('text/html');
+  
+  if (isBrowser) {
+    return new Response(renderHtml(data), {
+      status,
+      headers: { 'Content-Type': 'text/html; charset=utf-8' }
+    });
+  }
+  
   return new Response(JSON.stringify(data), {
     status,
     headers: CORS_HEADERS
   });
+}
+
+function renderHtml(data) {
+  const title = data.hexagram_name || data.bazi ? '占卜结果' : '周易占卜';
+  return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title} - 周易占卜系统</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; color: #fff; padding: 20px; }
+    .container { max-width: 800px; margin: 0 auto; }
+    h1 { text-align: center; padding: 20px 0; font-size: 2em; background: linear-gradient(90deg, #f39c12, #e74c3c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .card { background: rgba(255,255,255,0.1); border-radius: 15px; padding: 25px; margin: 15px 0; }
+    .card h2 { color: #f39c12; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; }
+    .row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .row:last-child { border-bottom: none; }
+    .label { color: #aaa; }
+    .value { color: #fff; font-weight: bold; }
+    .highlight { color: #f39c12; font-size: 1.5em; }
+    .tag { display: inline-block; background: rgba(243,156,18,0.3); padding: 5px 15px; border-radius: 20px; margin: 5px; }
+    .nav { text-align: center; margin: 20px 0; }
+    .nav a { color: #f39c12; text-decoration: none; margin: 0 15px; }
+    .nav a:hover { text-decoration: underline; }
+    pre { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; overflow-x: auto; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>☯ ${title}</h1>
+    ${renderData(data)}
+    <div class="nav">
+      <a href="/">返回首页</a>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+function renderData(data) {
+  if (data.bazi) {
+    return renderBazi(data);
+  } else if (data.hexagram_name) {
+    return renderHexagram(data);
+  } else if (data.palaces) {
+    return renderZiwei(data);
+  } else {
+    return `<div class="card"><pre>${JSON.stringify(data, null, 2)}</pre></div>`;
+  }
+}
+
+function renderBazi(data) {
+  return `
+    <div class="card">
+      <h2>📅 日期信息</h2>
+      <div class="row"><span class="label">阳历</span><span class="value">${data.solar}</span></div>
+      <div class="row"><span class="label">阴历</span><span class="value">${data.lunar}</span></div>
+    </div>
+    <div class="card">
+      <h2>🔮 八字命盘</h2>
+      <div style="text-align:center;padding:20px;">
+        <span class="tag">${data.bazi[0]}</span>
+        <span class="tag">${data.bazi[1]}</span>
+        <span class="tag highlight">${data.bazi[2]}</span>
+        <span class="tag">${data.bazi[3]}</span>
+      </div>
+      <div class="row"><span class="label">年柱</span><span class="value">${data.bazi[0]}</span></div>
+      <div class="row"><span class="label">月柱</span><span class="value">${data.bazi[1]}</span></div>
+      <div class="row"><span class="label">日柱（日主）</span><span class="value">${data.bazi[2]}</span></div>
+      <div class="row"><span class="label">时柱</span><span class="value">${data.bazi[3]}</span></div>
+    </div>
+    <div class="card">
+      <h2>🔥 五行分析</h2>
+      <div class="row"><span class="label">五行分布</span><span class="value">${Object.entries(data.wuxing_counts).map(([k,v]) => `${k}${v}`).join(' ')}</span></div>
+      <div class="row"><span class="label">缺失五行</span><span class="value" style="color:#e74c3c;">${data.missing_wuxing.join('、') || '无'}</span></div>
+    </div>
+    <div class="card">
+      <h2>⚖️ 日主分析</h2>
+      <div class="row"><span class="label">日主</span><span class="value">${data.day_master.gan}（${data.day_master.wuxing}）</span></div>
+      <div class="row"><span class="label">强弱</span><span class="value">${data.day_master.strength}</span></div>
+      <div class="row"><span class="label">月令关系</span><span class="value">${data.day_master.month_relation}</span></div>
+      <div class="row"><span class="label">配偶宫</span><span class="value">${data.spouse_palace}</span></div>
+    </div>`;
+}
+
+function renderHexagram(data) {
+  return `
+    <div class="card">
+      <h2>☰ 本卦：${data.hexagram_name}</h2>
+      <div style="text-align:center;font-size:3em;padding:20px;">${data.hexagram_symbol || '☰'}</div>
+      <div class="row"><span class="label">上卦</span><span class="value">${data.upper_trigram || ''}</span></div>
+      <div class="row"><span class="label">下卦</span><span class="value">${data.lower_trigram || ''}</span></div>
+    </div>
+    ${data.interpretation ? `<div class="card"><h2>📖 解卦</h2><p style="line-height:1.8;">${data.interpretation}</p></div>` : ''}
+    ${data.zhuge_result ? `<div class="card"><h2>🎋 诸葛神数</h2><p style="line-height:1.8;">${data.zhuge_result}</p></div>` : ''}`;
+}
+
+function renderZiwei(data) {
+  let html = `<div class="card"><h2>🌟 紫微斗数命盘</h2></div>`;
+  if (data.palaces && Array.isArray(data.palaces)) {
+    data.palaces.forEach(p => {
+      html += `<div class="card"><h2>${p.name}</h2><div class="row"><span class="label">主星</span><span class="value">${p.mainStars?.join('、') || '无'}</span></div></div>`;
+    });
+  }
+  return html;
 }
 
 async function handleRequest(request) {
@@ -80,7 +197,7 @@ async function handleRequest(request) {
   }
 
   if (path === '/health' || path === '/api/health') {
-    return jsonResponse({ status: 'ok', timestamp: new Date().toISOString(), version: '1.0.0' });
+    return jsonResponse({ status: 'ok', timestamp: new Date().toISOString(), version: '1.0.0' }, 200, request);
   }
 
   async function getParams() {
@@ -102,19 +219,19 @@ async function handleRequest(request) {
   if (path === '/divine/text' || path === '/api/divine/text') {
     const body = await getParams();
     const result = calculateHexagramFromText(body.text || '占卜', body.focus || 'general');
-    return jsonResponse(result);
+    return jsonResponse(result, 200, request);
   }
 
   if (path === '/divine/zhuge' || path === '/api/divine/zhuge') {
     const body = await getParams();
     const result = getZhugeFromText(body.text || '诸葛神数');
-    return jsonResponse(result);
+    return jsonResponse(result, 200, request);
   }
 
   if (path === '/divine/pair' || path === '/api/divine/pair') {
     const body = await getParams();
     const result = calculateHexagramFromNumbers(body.num1 || 1, body.num2 || 2);
-    return jsonResponse(result);
+    return jsonResponse(result, 200, request);
   }
 
   if (path === '/divine/ziwei' || path === '/api/divine/ziwei') {
@@ -125,7 +242,7 @@ async function handleRequest(request) {
       body.day || 1,
       body.hour || 12
     );
-    return jsonResponse(chart.toJSON());
+    return jsonResponse(chart.toJSON(), 200, request);
   }
 
   if (path === '/divine/bazi' || path === '/api/divine/bazi') {
@@ -136,7 +253,7 @@ async function handleRequest(request) {
       body.day || 1,
       body.hour || 12
     );
-    return jsonResponse(result);
+    return jsonResponse(result, 200, request);
   }
 
   if (path === '/divine/match' || path === '/api/divine/match') {
@@ -154,20 +271,20 @@ async function handleRequest(request) {
       body.female_hour || 12
     );
     const result = checkMarriageCompatibility(male, female);
-    return jsonResponse(result);
+    return jsonResponse(result, 200, request);
   }
 
   if (path === '/divine/random' || path === '/api/divine/random') {
     const result = getRandomDivination();
-    return jsonResponse(result);
+    return jsonResponse(result, 200, request);
   }
 
   if (path === '/divine/current' || path === '/api/divine/current') {
     const result = getCurrentTimeDivination();
-    return jsonResponse(result);
+    return jsonResponse(result, 200, request);
   }
 
-  return jsonResponse({ error: 'Not found', hint: 'Use GET with query params or POST with JSON body' }, 404);
+  return jsonResponse({ error: 'Not found', hint: 'Use GET with query params or POST with JSON body' }, 404, request);
 }
 
 export default {
