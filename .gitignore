@@ -19,3 +19,6 @@ test_*.py
 
 # Local Archive (Not for GitHub)
 local_archive/
+
+# Backup folder (Not for GitHub)
+Backup/

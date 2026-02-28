@@ -1,32 +1,45 @@
 # zhouyi-web
 
-**Description:** 周易占卜系统 - I Ching divination web application deployed on Cloudflare Workers
+**Description:** 周易占卜系统 - I Ching divination web application with Python FastAPI backend
 
 ## Overview
 
-这是一个基于周易（易经）的占卜系统，提供梅花易数、八字分析、紫微斗数、诸葛神数等多种占卜功能。应用部署在 Cloudflare Workers 上，具有全球边缘计算能力，响应速度快。
+这是一个基于周易（易经）的占卜系统，提供梅花易数、八字分析、紫微斗数、诸葛神数等多种占卜功能。应用使用 Python FastAPI 构建，支持多种部署平台（Vercel、Cloudflare Workers、本地开发）。
 
 ## Deployment
 
-### Platform
-- **Cloudflare Workers** - 全球边缘计算平台
-- **URL:** https://zhouyi-web.15996221599.workers.dev
+### Platforms
+- **Vercel** - Serverless deployment (Primary)
+- **Cloudflare Workers** - Python Workers support
+- **Local Development** - FastAPI with Uvicorn
 
 ### GitHub Actions CI/CD
 - **Workflow:** `.github/workflows/deploy.yml`
-- **Secrets Required:** `CLOUDFLARE_API_TOKEN`
-- **Environment Variables:** `CLOUDFLARE_ACCOUNT_ID`
+- **Vercel:** Automatic deployment on push to master
+- **Cloudflare:** Manual deployment with `wrangler deploy`
 
 ### Local Development
 ```bash
-cd js
-npm install
-npm run dev  # wrangler dev
+# Install dependencies
+pip install workers-py numpy ichingshifa strokes cn2an fastapi uvicorn lunar_python
+
+# Run server
+uvicorn api.server:app --host 0.0.0.0 --port 8000
+
+# Or use the script
+python api/server.py
 ```
 
-### Deploy
+### Deploy to Vercel
+```bash
+# Automatic deployment via GitHub Actions
+git push origin master
+```
+
+### Deploy to Cloudflare Workers
 ```bash
 cd js
+npm install
 npm run deploy  # wrangler deploy
 ```
 
@@ -55,46 +68,59 @@ npm run deploy  # wrangler deploy
 ## Architecture
 
 ```
+api/
+├── server.py       # FastAPI 应用入口，路由处理
+├── index.py        # Vercel serverless 入口
+├── utils.py        # 周易核心算法（梅花易数、诸葛神数等）
+├── bazi.py        # 八字分析
+├── ziwei.py       # 紫微斗数
+├── simple_lunar.py # 农历计算
+└── *.json         # 数据文件（易经卦象、诸葛神数等）
+public/
+├── index.html      # 静态前端页面
+├── style.css       # 样式文件
+└── *.png          # 支付二维码图片
+src/
+└── worker.py       # Cloudflare Workers 入口
 js/
-├── src/
-│   ├── index.js    # Worker 入口，路由处理
-│   ├── utils.js    # 周易核心算法（梅花易数等）
-│   ├── bazi.js     # 八字分析
-│   └── ziwei.js    # 紫微斗数
+├── src/           # JavaScript 版本（备用）
 ├── public/
-│   └── index.html  # 静态前端页面
-├── package.json
-└── wrangler.toml   # Cloudflare Workers 配置
+└── package.json
+pyproject.toml      # Python 项目配置
+requirements.txt    # Python 依赖
+vercel.json        # Vercel 配置
+wrangler.toml      # Cloudflare Workers 配置
 ```
 
 ## Code Patterns
 
-### Worker Entry Point
-```javascript
-export default {
-  async fetch(request, env, ctx) {
-    return handleRequest(request);
-  }
-};
+### FastAPI Server Entry
+```python
+app = FastAPI(title="Zhouyi Divination API")
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
 ```
 
-### CORS Headers
-```javascript
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type'
-};
+### CORS Middleware
+```python
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 ```
 
-### Browser/API Dual Format Response
-```javascript
-const accept = request?.headers?.get('Accept') || '';
-const isBrowser = accept.includes('text/html');
-if (isBrowser) {
-  return new Response(renderHtml(data), { headers: { 'Content-Type': 'text/html' } });
-}
-return new Response(JSON.stringify(data), { headers: CORS_HEADERS });
+### Dual Route Support (GET/POST)
+```python
+@app.post("/divine/text")
+@app.get("/divine/text")
+async def divine_text(req: TextRequest):
+    # 支持 GET (URL参数) 和 POST (JSON body)
+    return result
 ```
 
 ---
@@ -104,7 +130,8 @@ return new Response(JSON.stringify(data), { headers: CORS_HEADERS });
 > **Auto-Generated Section**: This section is maintained by `skill-evolution-manager`. Do not edit manually.
 
 ### User Preferences
-- 优先使用 JavaScript 实现 Worker，避免 Python 的启动时间问题
+- 使用 Python FastAPI 作为主要后端，支持本地开发和 Vercel 部署
 - API 应同时支持 GET 和 POST 请求以便测试
-- 浏览器访问应返回美化的 HTML 页面
-- 使用 GitHub Actions 自动部署
+- 使用 GitHub Actions 自动部署到 Vercel
+- 非必需的文件（测试脚本、文档、虚拟环境）移到 Backup 文件夹
+- 项目结构保持简洁，只保留必要的源代码和配置文件
