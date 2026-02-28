@@ -13,8 +13,8 @@
 </head>
 <body>
     <div class="lang-switch">
-        <button class="lang-btn active" onclick="setLang('zh')">中文</button>
-        <button class="lang-btn" onclick="setLang('en')">English</button>
+        <button class="lang-btn" onclick="setLang('zh')">中文</button>
+        <button class="lang-btn active" onclick="setLang('en')">English</button>
         <button class="lang-btn" onclick="setLang('fr')">Français</button>
     </div>
 
@@ -185,7 +185,7 @@
         console.log("%cZhouyi Divination System\n%cCopyright (C) 2026 Sugarworm\nLicensed under GPLv3", "font-size: 20px; color: #8b0000; font-weight: bold;", "font-size: 12px; color: #333;");
 
         const API_BASE = "/api/divine";
-        let currentLang = 'zh';
+        let currentLang = 'en';
         
         // Help Content (Bilingual)
         const helpContent = {

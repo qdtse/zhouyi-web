@@ -101,63 +101,10 @@ return new Response(JSON.stringify(data), { headers: CORS_HEADERS });
 
 ## User-Learned Best Practices & Constraints
 
-> 以下经验来自实际部署过程中的问题解决，由 Skill Evolution Manager 自动生成。
+> **Auto-Generated Section**: This section is maintained by `skill-evolution-manager`. Do not edit manually.
 
-### 成功的解决方案
-
-1. **Cloudflare Python Workers 启动超时**
-   - 问题：Python Workers 使用 Pyodide，启动时间约 2 秒，超过 Cloudflare 1000ms CPU 限制
-   - 解决方案：使用 JavaScript 重写 Worker，启动时间约 50ms
-   - 日期：2026-02-20
-
-2. **GitHub HTTPS 连接被阻止**
-   - 问题：网络环境限制导致 GitHub 443 端口无法访问
-   - 解决方案：使用 SSH over 443 端口绕过网络限制
-   ```bash
-   git remote set-url origin git@ssh.github.com:user/repo.git
-   $env:GIT_SSH_COMMAND="ssh -p 443"
-   ```
-   - 日期：2026-02-20
-
-3. **Cloudflare API Token 权限不足**
-   - 问题：多次部署失败，提示 Authentication error
-   - 解决方案：API Token 需要以下权限：
-     - Workers Scripts: Edit
-     - Account Settings: Read
-     - User Details: Read
-     - User Memberships: Read
-   - 最简单的解决方案是使用 Global API Key
-   - 日期：2026-02-20
-
-4. **Worker API 只支持 POST 请求**
-   - 问题：浏览器直接访问 API 返回 404
-   - 解决方案：修改路由逻辑，同时支持 GET（URL 参数）和 POST（JSON body）请求
-   - 日期：2026-02-20
-
-5. **浏览器访问 API 显示纯 JSON**
-   - 问题：用户体验不佳
-   - 解决方案：通过检查 Accept header 判断请求来源，浏览器返回 HTML，API 返回 JSON
-   - 日期：2026-02-20
-
-### 失败的尝试
-
-1. **尝试优化 Python Worker 启动时间**
-   - 原因：Pyodide 本身需要约 2 秒初始化，无法通过代码优化解决
-   - 教训：Cloudflare Python Workers 不适合需要快速启动的应用
-   - 日期：2026-02-20
-
-2. **使用 lunar-python 库**
-   - 原因：该库只有 .tar.gz 源码包，Pyodide 需要 wheel 包
-   - 教训：Cloudflare Python Workers 只支持 wheel 格式的依赖包
-   - 日期：2026-02-20
-
-### 用户偏好
-
+### User Preferences
 - 优先使用 JavaScript 实现 Worker，避免 Python 的启动时间问题
 - API 应同时支持 GET 和 POST 请求以便测试
 - 浏览器访问应返回美化的 HTML 页面
 - 使用 GitHub Actions 自动部署
-
----
-
-*Last updated: 2026-02-20 by Skill Evolution Manager*
